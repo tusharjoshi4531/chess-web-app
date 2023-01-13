@@ -12,6 +12,7 @@ import queen_b from "../../assets/queen_b.png";
 import queen_w from "../../assets/queen_w.png";
 import rook_b from "../../assets/rook_b.png";
 import rook_w from "../../assets/rook_w.png";
+import { Piece } from "../../global/InitialBoardState";
 
 type ChessBoardCellProps = {
   type: "light" | "dark";
@@ -22,32 +23,23 @@ type ChessBoardCellProps = {
   displayRank?: boolean;
   displayFile?: boolean;
   highlight?: "none" | "red" | "yellow" | "blue";
-  peice?:
-    | "none"
-    | "white-pawn"
-    | "white-king"
-    | "white-queen"
-    | "white-rook"
-    | "white-knight"
-    | "black-pawn"
-    | "black-king"
-    | "black-queen"
-    | "black-rook"
-    | "black-knight";
+  peice?: Piece
 };
 
 const peiceImageSources = {
-  none: null,
+  "none": null,
   "white-pawn": pawn_w,
   "white-king": king_w,
   "white-queen": queen_w,
   "white-rook": rook_w,
   "white-knight": knight_w,
+  "white-bishop": bishop_w,
   "black-pawn": pawn_b,
   "black-king": king_b,
   "black-queen": queen_b,
   "black-rook": rook_b,
   "black-knight": knight_b,
+  "black-bishop": bishop_b,
 };
 
 const ChessBoardCell = ({

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { initialBoardState } from "../../global/InitialBoardState";
 import styles from "./ChessBoard.module.css";
 import ChessBoardCell from "./ChessBoardCell";
 
@@ -6,20 +8,27 @@ type ChessBoardProps = {
 };
 
 const ChessBoard = ({ size }: ChessBoardProps) => {
+  const [boardState, setBoardState] = useState(initialBoardState);
+
   const cells: JSX.Element[] = [];
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
-      const type = (i + j) % 2 == 1 ? "dark" : "light";
-      const cordinate = { file: j, rank: 7 - i };
+      const type = (i + j) % 2 === 1 ? "dark" : "light";
+      const rank = 7 - i;
+      const file = j;
+      const displayFile = rank === 0;
+      const displayRank = file === 7;
+      const piece = boardState[rank][file];
+      console.log(piece)
 
       cells.push(
         <ChessBoardCell
           key={`${i}${j}`}
           type={type}
-          cordinate={cordinate}
-          displayFile={cordinate.rank === 0}
-          displayRank={cordinate.file === 7}
-          peice="black-rook"
+          cordinate={{ rank, file }}
+          displayFile={displayFile}
+          displayRank={displayRank}
+          peice={piece}
         />
       );
     }

@@ -1,6 +1,6 @@
 :root {
-  --light: wheat;
-  --dark: rgb(83, 0, 0);
+  --light: lightgray;
+  --dark: slategrey;
 }
 
 .cell {

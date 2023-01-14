@@ -1,0 +1,31 @@
+:root {
+  --statusWidth: 250px;
+  --navBackgroundColor: rgb(51, 20, 0);
+}
+
+.layout {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-areas: "game status";
+  grid-template-columns: 1fr var(--statusWidth);
+}
+
+.nav {
+  background-color: bisque;
+  grid-area: nav;
+}
+
+.game {
+  
+  grid-area: game;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.status {
+  background-color: rebeccapurple;
+  grid-area: status;
+}

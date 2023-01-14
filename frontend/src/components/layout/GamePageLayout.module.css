@@ -17,12 +17,17 @@
 }
 
 .game {
-  
   grid-area: game;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  
+  background-image: url("../../assets/backroundImage.jpg");
+  background-size: 150%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .status {

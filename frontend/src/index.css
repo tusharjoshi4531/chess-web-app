@@ -10,10 +10,8 @@ body {
 #root {
   width: 100vw;
   height: 100vh;
-  background-image: url("./assets/backroundImage.jpg");
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
+  display: flex;
+  align-items: stretch;
 }
 
 code {

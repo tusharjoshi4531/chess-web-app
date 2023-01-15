@@ -1,5 +1,5 @@
 import ChessBoard from "../game/ChessBoard";
-import styles from "./GamePageLayout.module.css";
+import styles from "./GameLayout.module.css";
 
 type GamePageLayoutProps = {
   game: React.ReactNode;

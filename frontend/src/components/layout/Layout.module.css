@@ -7,22 +7,27 @@
   flex-grow: 1;
   display: grid;
   grid-template-areas: "header header"
-                        "nav body";
+                        "drawer body";
   grid-template-columns: var(--navWidth) 1fr;
   grid-template-rows: var(--headHeight) 1fr;
 }
 
-.header {
+.layout header {
   grid-area: header;
   background-color: rosybrown;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  z-index: 1;
+  display: flex;
 }
 
-.nav {
-  grid-area: nav;
+.layout aside {
+  grid-area: drawer;
   background-color: red;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  display: flex;
 }
 
-.body {
+.layout section {
   grid-area: body;
   display: flex;
 }

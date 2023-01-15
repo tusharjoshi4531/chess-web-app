@@ -12,7 +12,7 @@ import queen_b from "../../assets/queen_b.png";
 import queen_w from "../../assets/queen_w.png";
 import rook_b from "../../assets/rook_b.png";
 import rook_w from "../../assets/rook_w.png";
-import { Piece } from "../../global/InitialBoardState";
+import { Piece } from "../../global/types";
 
 type ChessBoardCellProps = {
   type: "light" | "dark";
@@ -23,11 +23,12 @@ type ChessBoardCellProps = {
   displayRank?: boolean;
   displayFile?: boolean;
   highlight?: "none" | "red" | "yellow" | "blue";
-  peice?: Piece
+  peice?: Piece;
+  onClick: (file: number, rank: number) => void;
 };
 
 const peiceImageSources = {
-  "none": null,
+  none: null,
   "white-pawn": pawn_w,
   "white-king": king_w,
   "white-queen": queen_w,
@@ -49,6 +50,7 @@ const ChessBoardCell = ({
   displayRank = false,
   highlight = "none",
   peice = "none",
+  onClick,
 }: ChessBoardCellProps) => {
   const cellClasses: string = `${styles.cell} ${
     type === "dark" ? styles.dark : styles.light
@@ -69,7 +71,10 @@ const ChessBoardCell = ({
     : "";
 
   return (
-    <div className={cellClasses}>
+    <div
+      className={cellClasses}
+      onClick={() => onClick(cordinate.file, cordinate.rank)}
+    >
       <div className={styles.cellTextContainer}>
         <span className={styles.cellRankText}>{rank}</span>
         <span className={styles.cellFileText}>{file}</span>

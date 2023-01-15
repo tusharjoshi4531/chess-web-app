@@ -1,4 +1,6 @@
+import Header from "./Header";
 import styles from "./Layout.module.css";
+import NavigationDrawer from "./NavigationDrawer";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -7,9 +9,13 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
   return (
     <div className={styles.layout}>
-      <div className={styles.header}>head</div>
-      <div className={styles.nav}>nav</div>
-      <div className={styles.body}>{children}</div>
+      <header>
+        <Header />
+      </header>
+      <aside>
+        <NavigationDrawer />
+      </aside>
+      <section>{children}</section>
     </div>
   );
 };

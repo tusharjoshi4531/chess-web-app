@@ -5,9 +5,10 @@ import ChessBoardCell from "./ChessBoardCell";
 
 type ChessBoardProps = {
   size: number;
+  onCellClick: (file: number, rank: number) => void;
 };
 
-const ChessBoard = ({ size }: ChessBoardProps) => {
+const ChessBoard = ({ size, onCellClick }: ChessBoardProps) => {
   const [boardState, setBoardState] = useState(initialBoardState);
 
   const cells: JSX.Element[] = [];
@@ -19,7 +20,6 @@ const ChessBoard = ({ size }: ChessBoardProps) => {
       const displayFile = rank === 0;
       const displayRank = file === 7;
       const piece = boardState[rank][file];
-      console.log(piece)
 
       cells.push(
         <ChessBoardCell
@@ -29,6 +29,7 @@ const ChessBoard = ({ size }: ChessBoardProps) => {
           displayFile={displayFile}
           displayRank={displayRank}
           peice={piece}
+          onClick={onCellClick}
         />
       );
     }

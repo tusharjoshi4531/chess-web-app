@@ -1,0 +1,15 @@
+:root{
+  --headerColor: rgb(73, 73, 73);
+}
+
+.container {
+  flex-grow: 1;
+  background-color: var(--headerColor);
+  display: flex;
+  justify-content: center;
+}
+
+.container h3 {
+  color: white;
+  text-align: center;
+}

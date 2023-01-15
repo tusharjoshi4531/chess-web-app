@@ -1,20 +1,20 @@
+import { useEffect, useState } from "react";
 import ChessBoard from "../components/game/ChessBoard";
-import GameLayout from "../components/layout/GameLayout";
-import Timer from "../components/ui/Timer";
+import GamePageLayout from "../components/layout/GameLayout";
 
-const GamePage = () => {
+const BoardPage = () => {
+
   const cellClickHandler = (file: number, rank: number) => {
     console.log({ file, rank });
   };
 
+
+
   return (
-    // <ChessBoard size={600}/>
-    <GameLayout
+    <GamePageLayout
       game={
         <>
-          <Timer color="black" />
           <ChessBoard size={600} onCellClick={cellClickHandler} />
-          <Timer color="white" />
         </>
       }
       status={<div>hi</div>}
@@ -22,4 +22,4 @@ const GamePage = () => {
   );
 };
 
-export default GamePage;
+export default BoardPage;

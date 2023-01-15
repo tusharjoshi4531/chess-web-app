@@ -1,19 +1,5 @@
-export type Piece =
-  | "none"
-  | "white-pawn"
-  | "white-rook"
-  | "white-queen"
-  | "white-bishop"
-  | "white-knight"
-  | "white-king"
-  | "black-pawn"
-  | "black-rook"
-  | "black-queen"
-  | "black-bishop"
-  | "black-knight"
-  | "black-king";
+import { BoardState } from "./types";
 
-export type BoardState = Piece[][];
 
 export const initialBoardState: BoardState = [
   [

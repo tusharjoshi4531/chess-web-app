@@ -12,10 +12,26 @@ import queen_b from "../../assets/queen_b.png";
 import queen_w from "../../assets/queen_w.png";
 import rook_b from "../../assets/rook_b.png";
 import rook_w from "../../assets/rook_w.png";
-import { Piece } from "../../global/types";
+import {
+  Color,
+  Piece,
+  W_B,
+  W_K,
+  W_P,
+  W_Q,
+  W_R,
+  B_B,
+  B_K,
+  B_P,
+  B_Q,
+  B_R,
+  BLACK,
+  W_N,
+  B_N,
+} from "../../global/types";
 
 type ChessBoardCellProps = {
-  type: "light" | "dark";
+  type: Color;
   cordinate: {
     file: number;
     rank: number;
@@ -27,21 +43,23 @@ type ChessBoardCellProps = {
   onClick: (file: number, rank: number) => void;
 };
 
-const peiceImageSources = {
-  none: null,
-  "white-pawn": pawn_w,
-  "white-king": king_w,
-  "white-queen": queen_w,
-  "white-rook": rook_w,
-  "white-knight": knight_w,
-  "white-bishop": bishop_w,
-  "black-pawn": pawn_b,
-  "black-king": king_b,
-  "black-queen": queen_b,
-  "black-rook": rook_b,
-  "black-knight": knight_b,
-  "black-bishop": bishop_b,
-};
+const pieceImageSources = new Map<number | null, string | undefined>([
+  [null, undefined],
+  [W_P, pawn_w],
+  [W_N, knight_w],
+  [W_K, king_w],
+  [W_Q, queen_w],
+  [W_R, rook_w],
+  [W_B, bishop_w],
+  [B_P, pawn_b],
+  [B_N, knight_b],
+  [B_K, king_b],
+  [B_Q, queen_b],
+  [B_R, rook_b],
+  [B_B, bishop_b],
+]);
+
+console.log(pieceImageSources.get(0));
 
 const ChessBoardCell = ({
   type,
@@ -49,11 +67,11 @@ const ChessBoardCell = ({
   displayFile = false,
   displayRank = false,
   highlight = "none",
-  peice = "none",
+  peice = null,
   onClick,
 }: ChessBoardCellProps) => {
   const cellClasses: string = `${styles.cell} ${
-    type === "dark" ? styles.dark : styles.light
+    type === BLACK ? styles.dark : styles.light
   }`;
 
   let highlightCLasses = "";
@@ -79,7 +97,7 @@ const ChessBoardCell = ({
         <span className={styles.cellRankText}>{rank}</span>
         <span className={styles.cellFileText}>{file}</span>
       </div>
-      {peice !== "none" && <img src={peiceImageSources[peice]} alt="bish" />}
+      {peice !== null && <img src={pieceImageSources.get(peice)} alt="bish" />}
       {highlight !== "none" && <div className={highlightCLasses}></div>}
     </div>
   );

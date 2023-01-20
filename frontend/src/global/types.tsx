@@ -22,3 +22,7 @@ export type Square = {
   file: number;
   rank: number;
 };
+
+export type BoardChange = [number, Piece, Piece];
+
+export type Move = BoardChange[];

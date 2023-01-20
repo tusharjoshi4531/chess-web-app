@@ -4,27 +4,45 @@ import {
   BLACK,
   BoardState,
   Color,
+  Move,
   Piece,
   Square,
   WHITE,
+  B_B,
+  B_K,
+  B_N,
+  B_P,
+  B_Q,
+  B_R,
+  W_B,
+  W_K,
+  W_N,
+  W_P,
+  W_Q,
+  W_R,
+  BoardChange,
 } from "../global/types";
+import {
+  getColor,
+  checkPawn,
+  checkBishop,
+  checkKing,
+  checkKnight,
+  checkQueen,
+  checkRook,
+} from "../helper/piece-check";
 
 type BoardContextData = {
-  boardState: BoardState;
-  chosenSquare: Square | null;
-  enPassentSquare: Square | null;
-  turn: Color;
-  setChosenSquare: React.Dispatch<React.SetStateAction<Square | null>>;
-  setEnPassentSquare: React.Dispatch<React.SetStateAction<Square | null>>;
-  setBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
-  setTurn: React.Dispatch<React.SetStateAction<Color>>;
-  getColor: (piece: Piece) => Color | null;
-  checkPawn: (color: Color, cordinate: Square) => boolean;
-  checkBishop: (cordinate: Square) => boolean;
-  checkKnight: (cordinate: Square) => boolean;
-  checkRook: (cordinate: Square) => boolean;
-  checkQueen: (cordinate: Square) => boolean;
-  checkKing: (cordinate: Square) => boolean;
+  moveNumber: number;
+  isOnCurrentMove: () => boolean;
+  setMoveNumber: React.Dispatch<React.SetStateAction<number>>;
+  onChoseSquare: (
+    file: number,
+    rank: number,
+    onMoveFinish?: (changes: Move) => void
+  ) => void;
+  addMove: (move: Move) => void;
+  changeMove: (targetMoveNumber: number) => void;
 };
 
 type BoardProviderProps = {
@@ -32,21 +50,12 @@ type BoardProviderProps = {
 };
 
 export const BoardContext = createContext<BoardContextData>({
-  boardState: initialBoardState,
-  chosenSquare: null,
-  enPassentSquare: null,
-  turn: 0,
-  setChosenSquare: () => {},
-  setEnPassentSquare: () => {},
-  setBoardState: () => {},
-  setTurn: () => {},
-  getColor: () => null,
-  checkPawn: () => true,
-  checkBishop: () => true,
-  checkKnight: () => true,
-  checkRook: () => true,
-  checkQueen: () => true,
-  checkKing: () => true,
+  moveNumber: 0,
+  isOnCurrentMove: () => true,
+  setMoveNumber: () => {},
+  addMove: () => {},
+  onChoseSquare: () => {},
+  changeMove: () => {},
 });
 
 export const BoardProvider = ({ children }: BoardProviderProps) => {
@@ -54,152 +63,196 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
   const [chosenSquare, setChosenSquare] = useState<Square | null>(null);
   const [enPassentSquare, setEnPassentSquare] = useState<Square | null>(null);
   const [turn, setTurn] = useState<Color>(0);
+  const [moveNumber, setMoveNumber] = useState<number>(0);
+  const [moves, setMoves] = useState<Move[]>([]);
 
-  const getColor = (piece: Piece): Color | null => {
-    if (piece === null) return null;
-    if (piece < 6) return WHITE;
-    else return BLACK;
+  const isOnCurrentMove = () => moves.length === moveNumber;
+
+  const addMove = (move: Move) => {
+    setMoves((state) => [...state, move]);
+    setMoveNumber((state) => state + 1);
   };
 
-  const checkPawn = (color: Color, cordinate: Square) => {
-    const dir = 1 - 2 * color;
-    const startingRank = color === WHITE ? 1 : 6;
+  const changeMove = (targetMoveNumber: number) => {
+    if (targetMoveNumber > moves.length || targetMoveNumber < 0) return;
 
-    if (chosenSquare === null) return false;
-
-    if (
-      enPassentSquare !== null &&
-      cordinate.file === enPassentSquare.file &&
-      cordinate.rank === enPassentSquare.rank
-    ) {
-      return true;
-    }
-
-    if (
-      cordinate.file === chosenSquare.file &&
-      cordinate.rank === chosenSquare.rank + 1 * dir &&
-      boardState[cordinate.rank][cordinate.file] === null
-    ) {
-      return true;
-    }
-
-    if (
-      cordinate.file === chosenSquare.file &&
-      chosenSquare.rank === startingRank &&
-      cordinate.rank === startingRank + 2 * dir &&
-      boardState[cordinate.rank][cordinate.file] === null
-    ) {
-      return true;
-    }
-
-    if (
-      cordinate.rank === chosenSquare.rank + 1 * dir &&
-      (cordinate.file === chosenSquare.file + 1 ||
-        cordinate.file === chosenSquare.file - 1) &&
-      getColor(boardState[cordinate.rank][cordinate.file]) === (1 ^ color)
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const checkBishop = (cordinate: Square) => {
-    if (chosenSquare === null) return false;
-
-    const dirFile = Math.sign(cordinate.file - chosenSquare.file);
-    const dirRank = Math.sign(cordinate.rank - chosenSquare.rank);
-
-    let file = chosenSquare.file + dirFile;
-    let rank = chosenSquare.rank + dirRank;
-
-    while (file !== cordinate.file && rank !== cordinate.rank) {
-      if (boardState[rank][file] !== null) {
-        return false;
+    setBoardState((state) => {
+      if (targetMoveNumber < moveNumber) {
+        return moveBack(targetMoveNumber, moveNumber, state);
+      } else {
+        return moveForward(targetMoveNumber, moveNumber, state);
       }
-      file += dirFile;
-      rank += dirRank;
-    }
-
-    return true;
+    });
+    setMoveNumber(targetMoveNumber);
   };
 
-  const checkKnight = (cordinate: Square) => {
-    if (chosenSquare === null) return false;
+  const moveBack = (
+    targetMoveNumber: number,
+    currentMoveNumber: number,
+    state: BoardState
+  ): BoardState => {
+    while (currentMoveNumber != targetMoveNumber) {
+      currentMoveNumber -= 1;
+      const currentMove = moves[currentMoveNumber];
+      console.log(currentMove);
 
-    const len = Math.max(
-      Math.abs(cordinate.file - chosenSquare.file),
-      Math.abs(cordinate.rank - chosenSquare.rank)
-    );
-    const wid = Math.min(
-      Math.abs(cordinate.rank - chosenSquare.rank),
-      Math.abs(cordinate.file - chosenSquare.file)
-    );
+      currentMove.forEach((change) => {
+        const rank = Math.floor(change[0] / 10);
+        const file = change[0] % 10;
 
-    console.log({ len, wid });
+        state[rank][file] = change[1];
+      });
+    }
+    return state;
+  };
 
-    if (len !== 2 || wid !== 1) {
-      return false;
+  const moveForward = (
+    targetMoveNumber: number,
+    currentMoveNumber: number,
+    state: BoardState
+  ): BoardState => {
+    while (currentMoveNumber != targetMoveNumber) {
+      const currentMove = moves[currentMoveNumber];
+      console.log(currentMove);
+
+      currentMove.forEach((change) => {
+        const rank = Math.floor(change[0] / 10);
+        const file = change[0] % 10;
+
+        state[rank][file] = change[2];
+      });
+      currentMoveNumber += 1;
+    }
+    return state;
+  };
+
+  const updateBoard = (
+    file: number,
+    rank: number,
+    changes: BoardChange[],
+    callBack: (state: BoardState) => void = () => {}
+  ) => {
+    if (chosenSquare === null) return;
+
+    setBoardState((state) => {
+      changes.push([
+        rank * 10 + file,
+        state[rank][file],
+        state[chosenSquare.rank][chosenSquare.file],
+      ]);
+      state[rank][file] = state[chosenSquare.rank][chosenSquare.file];
+
+      changes.push([
+        chosenSquare.rank * 10 + chosenSquare.file,
+        state[chosenSquare.rank][chosenSquare.file],
+        null,
+      ]);
+      state[chosenSquare.rank][chosenSquare.file] = null;
+
+      setChosenSquare(null);
+      setTurn((turn) => (turn === WHITE ? BLACK : WHITE));
+
+      callBack(state);
+
+      return state;
+    });
+  };
+
+  const movePiece = (
+    file: number,
+    rank: number,
+    onMoveFinish: (changes: BoardChange[]) => void
+  ) => {
+    if (chosenSquare === null) return null;
+
+    const changes: BoardChange[] = [];
+
+    if (getColor(boardState[rank][file]) === turn) {
+      setChosenSquare(null);
+      return null;
+    } else if (
+      (boardState[chosenSquare.rank][chosenSquare.file] === W_P ||
+        boardState[chosenSquare.rank][chosenSquare.file] === B_P) &&
+      checkPawn(boardState, turn, { file, rank }, chosenSquare, enPassentSquare)
+    ) {
+      updateBoard(file, rank, changes, (state) => {
+        if (
+          enPassentSquare !== null &&
+          enPassentSquare.file === file &&
+          enPassentSquare.rank === rank
+        ) {
+          changes.push([
+            file * 10 + chosenSquare.rank,
+            state[chosenSquare.rank][file],
+            null,
+          ]);
+          state[chosenSquare.rank][file] = null;
+        }
+
+        if (Math.abs(rank - chosenSquare.rank) === 2) {
+          setEnPassentSquare({
+            file,
+            rank: rank - (rank - chosenSquare.rank) / 2,
+          });
+        } else {
+          setEnPassentSquare(null);
+        }
+        onMoveFinish(changes);
+      });
     } else {
-      return true;
-    }
-  };
+      const isValidMove =
+        ((boardState[chosenSquare.rank][chosenSquare.file] === W_B ||
+          boardState[chosenSquare.rank][chosenSquare.file] === B_B) &&
+          checkBishop(boardState, { file, rank }, chosenSquare)) ||
+        ((boardState[chosenSquare.rank][chosenSquare.file] === W_N ||
+          boardState[chosenSquare.rank][chosenSquare.file] === B_N) &&
+          checkKnight({ file, rank }, chosenSquare)) ||
+        ((boardState[chosenSquare.rank][chosenSquare.file] === W_R ||
+          boardState[chosenSquare.rank][chosenSquare.file] === B_R) &&
+          checkRook(boardState, { file, rank }, chosenSquare)) ||
+        ((boardState[chosenSquare.rank][chosenSquare.file] === W_Q ||
+          boardState[chosenSquare.rank][chosenSquare.file] === B_Q) &&
+          checkQueen(boardState, { file, rank }, chosenSquare)) ||
+        ((boardState[chosenSquare.rank][chosenSquare.file] === W_K ||
+          boardState[chosenSquare.rank][chosenSquare.file] === B_K) &&
+          checkKing(boardState, { file, rank }, chosenSquare));
 
-  const checkRook = (cordinate: Square) => {
-    if (chosenSquare === null) return false;
-
-    const dirFile = Math.sign(cordinate.file - chosenSquare.file);
-    const dirRank = Math.sign(cordinate.rank - chosenSquare.rank);
-
-    if (dirFile !== 0 && dirRank !== 0) return false;
-
-    if (dirFile !== 0) {
-      let file = chosenSquare.file + dirFile;
-      while (file !== cordinate.file) {
-        if (boardState[chosenSquare.rank][file] !== null) return false;
-        file += dirFile;
+      if (isValidMove) {
+        updateBoard(file, rank, changes, (state) => onMoveFinish(changes));
+      } else {
+        setChosenSquare(null);
       }
     }
+  };
 
-    if (dirRank !== 0) {
-      let rank = chosenSquare.rank + dirRank;
-      while (rank !== cordinate.rank) {
-        if (boardState[rank][chosenSquare.file] !== null) return false;
-        rank += dirRank;
-      }
+  const onChoseSquare = (
+    file: number,
+    rank: number,
+    onMoveFinish: (changes: BoardChange[]) => void = () => {}
+  ) => {
+    if (file === chosenSquare?.file && rank === chosenSquare.rank) {
+      return;
     }
 
-    return true;
-  };
-
-  const checkQueen = (cordinate: Square) => {
-    return checkBishop(cordinate) || checkRook(cordinate);
-  };
-
-  const checkKing = (cordinate: Square) => {
-    if (chosenSquare === null) return false;
-
-    return (
-      Math.abs(cordinate.file - chosenSquare.file) <= 1 &&
-      Math.abs(cordinate.rank - chosenSquare.rank) <= 1
-    );
+    if (chosenSquare === null) {
+      if (
+        (turn === WHITE && getColor(boardState[rank][file]) === WHITE) ||
+        (turn === BLACK && getColor(boardState[rank][file]) === BLACK)
+      ) {
+        setChosenSquare({ file, rank });
+      }
+    } else {
+      movePiece(file, rank, onMoveFinish);
+    }
   };
 
   const values: BoardContextData = {
-    boardState,
-    chosenSquare,
-    enPassentSquare,
-    turn,
-    setChosenSquare,
-    setEnPassentSquare,
-    setBoardState,
-    setTurn,
-    getColor,
-    checkPawn,
-    checkBishop,
-    checkKnight,
-    checkRook,
-    checkQueen,
-    checkKing
+    moveNumber,
+    isOnCurrentMove,
+    setMoveNumber,
+    onChoseSquare,
+    addMove,
+    changeMove,
   };
 
   return (

@@ -1,0 +1,17 @@
+.btn {
+  background-color: rgb(60, 60, 60);
+  border: none;
+  padding: 4px 8px;
+  margin: 0px 8px;
+  font-size: 20px;
+  color: white;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.btn:disabled {
+  background-color: gray;
+}
+
+.btn:hover {
+  background-color: rgb(78, 78, 78);
+}

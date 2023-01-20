@@ -5,7 +5,6 @@ import {
   BoardState,
   Color,
   Move,
-  Piece,
   Square,
   WHITE,
   B_B,
@@ -43,6 +42,8 @@ type BoardContextData = {
   ) => void;
   addMove: (move: Move) => void;
   changeMove: (targetMoveNumber: number) => void;
+  goToFirstMove: () => void;
+  goToLastMove: () => void;
 };
 
 type BoardProviderProps = {
@@ -56,6 +57,8 @@ export const BoardContext = createContext<BoardContextData>({
   addMove: () => {},
   onChoseSquare: () => {},
   changeMove: () => {},
+  goToFirstMove: () => {},
+  goToLastMove: () => {},
 });
 
 export const BoardProvider = ({ children }: BoardProviderProps) => {
@@ -124,6 +127,14 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
       currentMoveNumber += 1;
     }
     return state;
+  };
+
+  const goToFirstMove = () => {
+    changeMove(0);
+  };
+
+  const goToLastMove = () => {
+    changeMove(moves.length);
   };
 
   const updateBoard = (
@@ -253,6 +264,8 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
     onChoseSquare,
     addMove,
     changeMove,
+    goToFirstMove,
+    goToLastMove,
   };
 
   return (

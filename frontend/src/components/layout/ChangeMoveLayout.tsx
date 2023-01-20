@@ -5,11 +5,22 @@ import { useContext } from "react";
 import { BoardContext } from "../../store/board-context";
 
 const ChangeMoveLayout = () => {
-  const { changeMove, moveNumber, isOnCurrentMove } = useContext(BoardContext);
+  const {
+    moveNumber,
+    changeMove,
+    isOnCurrentMove,
+    goToFirstMove,
+    goToLastMove,
+  } = useContext(BoardContext);
 
   return (
     <div className={styles.container}>
-      <ChangeMoveButton>&#8612;</ChangeMoveButton>
+      <ChangeMoveButton
+        onClick={() => goToFirstMove()}
+        disabled={moveNumber === 0}
+      >
+        &#8612;
+      </ChangeMoveButton>
       <ChangeMoveButton
         onClick={() => changeMove(moveNumber - 1)}
         disabled={moveNumber === 0}
@@ -22,7 +33,12 @@ const ChangeMoveLayout = () => {
       >
         &#8608;
       </ChangeMoveButton>
-      <ChangeMoveButton>&#8614;</ChangeMoveButton>
+      <ChangeMoveButton
+        onClick={() => goToLastMove()}
+        disabled={isOnCurrentMove()}
+      >
+        &#8614;
+      </ChangeMoveButton>
     </div>
   );
 };

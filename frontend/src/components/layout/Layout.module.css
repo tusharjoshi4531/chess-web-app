@@ -1,6 +1,7 @@
 :root {
   --navWidth: 200px;
   --headHeight: 50px;
+  --asideColor: rgb(63, 63, 63);
 }
 
 .layout {
@@ -22,7 +23,7 @@
 
 .layout aside {
   grid-area: drawer;
-  background-color: red;
+  background-color: var(--asideColor);
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   display: flex;
 }

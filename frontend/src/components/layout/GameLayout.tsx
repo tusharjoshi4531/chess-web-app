@@ -1,12 +1,11 @@
-import ChessBoard from "../game/ChessBoard";
 import styles from "./GameLayout.module.css";
 
-type GamePageLayoutProps = {
+type GameLayoutProps = {
   game: React.ReactNode;
   status: React.ReactNode;
 };
 
-const GamePageLayout = ({ game, status }: GamePageLayoutProps) => {
+const GameLayout = ({ game, status }: GameLayoutProps) => {
   return (
     <div className={styles.layout}>
       <div className={styles.game}>
@@ -19,4 +18,4 @@ const GamePageLayout = ({ game, status }: GamePageLayoutProps) => {
   );
 };
 
-export default GamePageLayout;
+export default GameLayout;

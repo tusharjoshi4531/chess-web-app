@@ -15,12 +15,12 @@ import {
 } from "./types";
 
 export const initialBoardState: BoardState = [
-  [W_R, W_N, W_B, W_K, W_Q, W_B, W_N, W_R],
+  [W_R, W_N, W_B, W_Q, W_K, W_B, W_N, W_R],
   [W_P, W_P, W_P, W_P, W_P, W_P, W_P, W_P],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [B_P, B_P, B_P, B_P, B_P, B_P, B_P, B_P],
-  [B_R, B_N, B_B, B_K, B_Q, B_B, B_N, B_R],
+  [B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R],
 ];

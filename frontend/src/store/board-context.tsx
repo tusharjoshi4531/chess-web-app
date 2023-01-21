@@ -21,6 +21,7 @@ import {
   W_R,
   BoardChange,
 } from "../global/types";
+import { moveBack, moveForward } from "../helper/change-move";
 import {
   getColor,
   checkPawn,
@@ -29,7 +30,9 @@ import {
   checkKnight,
   checkQueen,
   checkRook,
-} from "../helper/piece-check";
+} from "../helper/check-piece";
+
+import { updateBoard } from "../helper/update-board";
 
 type BoardContextData = {
   moveNumber: number;
@@ -38,7 +41,11 @@ type BoardContextData = {
   onChoseSquare: (
     file: number,
     rank: number,
-    onMoveFinish?: (changes: Move) => void
+    onMoveFinish?: (
+      move: Move,
+      prevSquare?: Square | undefined,
+      currentSquare?: Square | undefined
+    ) => void
   ) => void;
   addMove: (move: Move) => void;
   changeMove: (targetMoveNumber: number) => void;
@@ -81,52 +88,12 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
 
     setBoardState((state) => {
       if (targetMoveNumber < moveNumber) {
-        return moveBack(targetMoveNumber, moveNumber, state);
+        return moveBack(targetMoveNumber, moveNumber, state, moves);
       } else {
-        return moveForward(targetMoveNumber, moveNumber, state);
+        return moveForward(targetMoveNumber, moveNumber, state, moves);
       }
     });
     setMoveNumber(targetMoveNumber);
-  };
-
-  const moveBack = (
-    targetMoveNumber: number,
-    currentMoveNumber: number,
-    state: BoardState
-  ): BoardState => {
-    while (currentMoveNumber != targetMoveNumber) {
-      currentMoveNumber -= 1;
-      const currentMove = moves[currentMoveNumber];
-      console.log(currentMove);
-
-      currentMove.forEach((change) => {
-        const rank = Math.floor(change[0] / 10);
-        const file = change[0] % 10;
-
-        state[rank][file] = change[1];
-      });
-    }
-    return state;
-  };
-
-  const moveForward = (
-    targetMoveNumber: number,
-    currentMoveNumber: number,
-    state: BoardState
-  ): BoardState => {
-    while (currentMoveNumber != targetMoveNumber) {
-      const currentMove = moves[currentMoveNumber];
-      console.log(currentMove);
-
-      currentMove.forEach((change) => {
-        const rank = Math.floor(change[0] / 10);
-        const file = change[0] % 10;
-
-        state[rank][file] = change[2];
-      });
-      currentMoveNumber += 1;
-    }
-    return state;
   };
 
   const goToFirstMove = () => {
@@ -137,42 +104,14 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
     changeMove(moves.length);
   };
 
-  const updateBoard = (
-    file: number,
-    rank: number,
-    changes: BoardChange[],
-    callBack: (state: BoardState) => void = () => {}
-  ) => {
-    if (chosenSquare === null) return;
-
-    setBoardState((state) => {
-      changes.push([
-        rank * 10 + file,
-        state[rank][file],
-        state[chosenSquare.rank][chosenSquare.file],
-      ]);
-      state[rank][file] = state[chosenSquare.rank][chosenSquare.file];
-
-      changes.push([
-        chosenSquare.rank * 10 + chosenSquare.file,
-        state[chosenSquare.rank][chosenSquare.file],
-        null,
-      ]);
-      state[chosenSquare.rank][chosenSquare.file] = null;
-
-      setChosenSquare(null);
-      setTurn((turn) => (turn === WHITE ? BLACK : WHITE));
-
-      callBack(state);
-
-      return state;
-    });
-  };
-
   const movePiece = (
     file: number,
     rank: number,
-    onMoveFinish: (changes: BoardChange[]) => void
+    onMoveFinish: (
+      move: Move,
+      prevSquare?: Square | undefined,
+      currentSquare?: Square | undefined
+    ) => void
   ) => {
     if (chosenSquare === null) return null;
 
@@ -186,30 +125,34 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
         boardState[chosenSquare.rank][chosenSquare.file] === B_P) &&
       checkPawn(boardState, turn, { file, rank }, chosenSquare, enPassentSquare)
     ) {
-      updateBoard(file, rank, changes, (state) => {
-        if (
-          enPassentSquare !== null &&
-          enPassentSquare.file === file &&
-          enPassentSquare.rank === rank
-        ) {
-          changes.push([
-            file * 10 + chosenSquare.rank,
-            state[chosenSquare.rank][file],
-            null,
-          ]);
-          state[chosenSquare.rank][file] = null;
-        }
+      setBoardState((state) =>
+        updateBoard({ file, rank }, chosenSquare, state, changes, () => {
+          if (
+            enPassentSquare !== null &&
+            enPassentSquare.file === file &&
+            enPassentSquare.rank === rank
+          ) {
+            changes.push([
+              chosenSquare.rank * 10 + file,
+              state[chosenSquare.rank][file],
+              null,
+            ]);
+            state[chosenSquare.rank][file] = null;
+          }
 
-        if (Math.abs(rank - chosenSquare.rank) === 2) {
-          setEnPassentSquare({
-            file,
-            rank: rank - (rank - chosenSquare.rank) / 2,
-          });
-        } else {
-          setEnPassentSquare(null);
-        }
-        onMoveFinish(changes);
-      });
+          if (Math.abs(rank - chosenSquare.rank) === 2) {
+            setEnPassentSquare({
+              file,
+              rank: rank - (rank - chosenSquare.rank) / 2,
+            });
+          } else {
+            setEnPassentSquare(null);
+          }
+          onMoveFinish(changes, chosenSquare, { file, rank });
+          setTurn((turn) => (turn === WHITE ? BLACK : WHITE));
+          setChosenSquare(null);
+        })
+      );
     } else {
       const isValidMove =
         ((boardState[chosenSquare.rank][chosenSquare.file] === W_B ||
@@ -229,7 +172,13 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
           checkKing(boardState, { file, rank }, chosenSquare));
 
       if (isValidMove) {
-        updateBoard(file, rank, changes, (state) => onMoveFinish(changes));
+        setBoardState((state) =>
+          updateBoard({ file, rank }, chosenSquare, state, changes, () => {
+            onMoveFinish(changes, chosenSquare, { file, rank });
+            setTurn((turn) => (turn === WHITE ? BLACK : WHITE));
+            setChosenSquare(null);
+          })
+        );
       } else {
         setChosenSquare(null);
       }

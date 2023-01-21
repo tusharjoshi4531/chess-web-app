@@ -1,0 +1,27 @@
+:root {
+  --moveContainerColor: rgb(80, 80, 80);
+}
+
+.container {
+  margin: 8px 0px;
+  display: flex;
+  flex-direction: column; 
+}
+
+.container span {
+  text-align: center;
+  color: white;
+  font-weight:  bold;
+}
+
+.moveContainer {
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+  background-color: var(--moveContainerColor);
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 2.6px inset;
+  overflow: scroll;
+  height: 250px;
+}

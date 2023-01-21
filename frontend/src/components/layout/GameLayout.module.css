@@ -1,6 +1,7 @@
 :root {
   --statusWidth: 250px;
   --navBackgroundColor: rgb(51, 20, 0);
+  --statusColor: rgb(63, 63, 63);
 }
 
 .layout {
@@ -30,6 +31,7 @@
 }
 
 .status {
-  background-color: rebeccapurple;
+  background-color: var(--statusColor);
   grid-area: status;
+  padding: 0px 16px;
 }

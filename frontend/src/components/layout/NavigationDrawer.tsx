@@ -1,20 +1,30 @@
-import NavigationDrawerButton from '../ui/NavigationDrawerButton'
-import styles from './NavigationDrawer.module.css'
+import NavigationDrawerButton from "../ui/NavigationDrawerButton";
+import styles from "./NavigationDrawer.module.css";
 
-const NavigationDrawer = () => {
-  return (
-    <div className={styles.container}>
-      <NavigationDrawerButton>
-        Home
-      </NavigationDrawerButton>
-      <NavigationDrawerButton>
-        Game
-      </NavigationDrawerButton>
-      <NavigationDrawerButton>
-        Board
-      </NavigationDrawerButton>
-    </div>
-  )
-}
+type NavigationDrawerProps = {
+    onClickHome: React.MouseEventHandler<HTMLButtonElement>;
+    onClickGame: React.MouseEventHandler<HTMLButtonElement>;
+    onClickBoard: React.MouseEventHandler<HTMLButtonElement>;
+};
 
-export default NavigationDrawer
+const NavigationDrawer = ({
+    onClickHome,
+    onClickGame,
+    onClickBoard,
+}: NavigationDrawerProps) => {
+    return (
+        <div className={styles.container}>
+            <NavigationDrawerButton onClick={onClickHome}>
+                Home
+            </NavigationDrawerButton>
+            <NavigationDrawerButton onClick={onClickGame}>
+                Game
+            </NavigationDrawerButton>
+            <NavigationDrawerButton onClick={onClickBoard}>
+                Board
+            </NavigationDrawerButton>
+        </div>
+    );
+};
+
+export default NavigationDrawer;

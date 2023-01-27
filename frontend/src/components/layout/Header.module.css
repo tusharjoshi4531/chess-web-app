@@ -1,15 +1,35 @@
 :root{
   --headerColor: rgb(73, 73, 73);
+  --headerButtonColor: rgb(46, 46, 46);
 }
 
 .container {
   flex-grow: 1;
   background-color: var(--headerColor);
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-areas: "overlap";
 }
 
 .container h3 {
   color: white;
   text-align: center;
+  margin: auto;
+  
+  grid-area: overlap;
+}
+
+.buttonContainer {
+  grid-area: overlap;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttonContainer button {
+  margin: 8px;
+  border-radius: 16px;
+  border: none;
+  padding: 0px 16px;
+  color: white;
+  background-color: var(--headerButtonColor);
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 2.6px;
 }

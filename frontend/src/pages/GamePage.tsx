@@ -3,6 +3,8 @@ import GameLayout from "../components/layout/GameLayout";
 import Timer from "../components/ui/Timer";
 
 const GamePage = () => {
+  
+
   const cellClickHandler = (file: number, rank: number) => {
     console.log({ file, rank });
   };

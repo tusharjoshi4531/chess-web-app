@@ -1,0 +1,57 @@
+:root {
+    --formBackgroundColor: gray;
+    --formShadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    --submitButtonColor: rgb(66, 66, 66);
+    --buttonShadow: rgba(0, 0, 0, 0.15) 0px 0px 2.6px;
+}
+
+.formControl {
+    background-color: var(--formBackgroundColor);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--formShadow);
+    display: flex;
+    flex-direction: column;
+}
+
+.formControl h3{
+    margin: none;
+}
+
+.formControl label{
+    margin-bottom: 8px;
+}
+
+.formControl input{
+    margin-bottom: 16px;
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+}
+
+.formActions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.formActions button {
+    border: none;
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-weight: bold;
+    box-shadow: var(--buttonShadow);
+    margin: 4px;
+}
+
+.formActions button[type=submit] {
+    background-color: var(--submitButtonColor);
+    color: white;
+}
+
+.divider {
+    border-radius: 2px;
+    border: 1px solid black;
+    margin-bottom: 16px;
+}
+

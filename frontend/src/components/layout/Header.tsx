@@ -1,12 +1,20 @@
-import styles from './Header.module.css'
+import styles from "./Header.module.css";
 
-const Header = () => {
+type HeaderPops = {
+    onClickLogin: React.MouseEventHandler<HTMLButtonElement>;
+    onClickSignup: React.MouseEventHandler<HTMLButtonElement>;
+};
 
-  return (
-    <div className={styles.container}>
-      <h3>App</h3>
-    </div>
-  )
-}
+const Header = ({ onClickLogin, onClickSignup }: HeaderPops) => {
+    return (
+        <div className={styles.container}>
+            <h3>App</h3>
+            <div className={styles.buttonContainer}>
+                <button onClick={onClickLogin}>Login</button>
+                <button onClick={onClickSignup}>Signup</button>
+            </div>
+        </div>
+    );
+};
 
-export default Header
+export default Header;

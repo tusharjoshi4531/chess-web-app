@@ -12,6 +12,7 @@ export const signup: RequestHandler = async (
     res
 ) => {
     const { username, email, password } = req.body;
+    console.log("signup");
 
     try {
         // Existing User Check

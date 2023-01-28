@@ -19,10 +19,30 @@ export type Color = 0 | 1;
 export type BoardState = Piece[][];
 
 export type Square = {
-  file: number;
-  rank: number;
+    file: number;
+    rank: number;
 };
 
 export type BoardChange = [number, Piece, Piece];
 
 export type Move = BoardChange[];
+
+export type UserRequestData = {
+    user: {
+        username: string;
+        email: string;
+        password: string;
+        _id: string;
+        __v: number;
+    };
+    token: string;
+};
+
+export type UserRequestCallback = (
+    username: string,
+    email: string,
+    user_id: string,
+    token: string
+) => void;
+
+export type RequestErrorCallback = (message: string) => void

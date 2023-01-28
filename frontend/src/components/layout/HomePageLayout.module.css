@@ -1,0 +1,17 @@
+:root {
+    --dividerColor: rgb(0, 0, 0);
+    --dividerWidth: 200px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.divider {
+    border: 2px solid var(--dividerColor);
+    margin: 0px auto;
+    width: var(--dividerWidth);
+    border-radius: 4px;
+}

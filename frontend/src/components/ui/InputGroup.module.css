@@ -1,0 +1,9 @@
+.container {
+    display: flex;
+    gap: 8px;
+}
+
+.container input {
+    flex: 1;
+}
+

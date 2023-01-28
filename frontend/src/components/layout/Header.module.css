@@ -18,13 +18,13 @@
   grid-area: overlap;
 }
 
-.buttonContainer {
+.actions {
   grid-area: overlap;
   display: flex;
   justify-content: flex-end;
 }
 
-.buttonContainer button {
+.actions button {
   margin: 8px;
   border-radius: 16px;
   border: none;
@@ -32,4 +32,10 @@
   color: white;
   background-color: var(--headerButtonColor);
   box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 2.6px;
+}
+
+.actions h4 {
+  color: white;
+  text-align: center;
+  margin: auto 25px;
 }

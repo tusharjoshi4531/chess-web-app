@@ -1,17 +1,21 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { useNavigate } from "react-router";
 import FormLayout from "../components/layout/FormLayout";
 import { login } from "../helper/user-auth";
-
-import styles from "./LoginPage.module.css";
+import { UserContext } from "../store/user-context";
 
 const LoginPage = () => {
     const formLayoutStyles: React.CSSProperties = {
         maxWidth: "400px",
-        margin: "auto",
+        margin: "32px auto",
     };
+
+    const navigate = useNavigate()
 
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
+
+    const { updateUserInfo } = useContext(UserContext);
 
     const loginSuccessHandler = (
         username: string,
@@ -19,12 +23,8 @@ const LoginPage = () => {
         user_id: string,
         token: string
     ) => {
-        console.log({
-            username,
-            email,
-            user_id,
-            token,
-        });
+        updateUserInfo(username, email, user_id, token);
+        navigate("/");
     };
 
     const loginErrorHandler = (message: string) => {
@@ -61,14 +61,12 @@ const LoginPage = () => {
     );
 
     return (
-        <div className={styles.container}>
-            <FormLayout
-                title="Login"
-                content={formContent}
-                actions={formActions}
-                style={formLayoutStyles}
-            />
-        </div>
+        <FormLayout
+            title="Login"
+            content={formContent}
+            actions={formActions}
+            style={formLayoutStyles}
+        />
     );
 };
 

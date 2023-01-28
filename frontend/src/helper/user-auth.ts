@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
 import { SERVER_URL } from "../global/strings";
 import {
     RequestErrorCallback,

@@ -1,0 +1,26 @@
+:root {
+    --selectedBackroundColor: rgb(46, 46, 46);
+    --unSelectedBackgroundColor: rgb(88, 88, 88);
+}
+
+.container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.container button {
+    flex: 1;
+    color: white;
+}
+
+.container button:hover {
+    background-color: var(--selectedBackroundColor);
+}
+
+.selected {
+    background-color: var(--selectedBackroundColor);
+}
+
+.unselected {
+    background-color: var(--unSelectedBackgroundColor);
+}

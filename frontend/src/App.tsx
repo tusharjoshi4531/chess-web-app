@@ -1,16 +1,22 @@
 import "./App.css";
 import GamePage from "./pages/GamePage";
 import Layout from "./components/layout/Layout";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import BoardPage from "./pages/BoardPage";
 import { BoardProvider } from "./store/board-context";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import { UserContext } from "./store/user-context";
+import { useContext } from "react";
+import HomePage from "./pages/HomePage";
 
 function App() {
+    const { userId } = useContext(UserContext);
+
     return (
         <Layout>
             <Routes>
+                <Route path="/" element={<HomePage />} />
                 <Route
                     path="/game"
                     element={
@@ -27,8 +33,13 @@ function App() {
                         </BoardProvider>
                     }
                 />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
+                {userId === "" && (
+                    <>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/signup" element={<SignupPage />} />
+                    </>
+                )}
+                <Route path="" element={<Navigate to="/" />} />
             </Routes>
         </Layout>
     );

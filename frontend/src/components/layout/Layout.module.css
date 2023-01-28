@@ -1,34 +1,37 @@
 :root {
-  --navWidth: 200px;
-  --headHeight: 50px;
-  --asideColor: rgb(63, 63, 63);
+    --navWidth: 200px;
+    --headHeight: 50px;
+    --asideColor: rgb(63, 63, 63);
+    --sectionColor: rgb(54, 54, 54);
 }
 
 .layout {
-  flex-grow: 1;
-  display: grid;
-  grid-template-areas: "header header"
-                        "drawer body";
-  grid-template-columns: var(--navWidth) 1fr;
-  grid-template-rows: var(--headHeight) 1fr;
+    flex-grow: 1;
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "drawer body";
+    grid-template-columns: var(--navWidth) 1fr;
+    grid-template-rows: var(--headHeight) 1fr;
 }
 
 .layout header {
-  grid-area: header;
-  background-color: rosybrown;
-  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-  z-index: 1;
-  display: flex;
+    grid-area: header;
+    background-color: rosybrown;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    z-index: 1;
+    display: flex;
 }
 
 .layout aside {
-  grid-area: drawer;
-  background-color: var(--asideColor);
-  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-  display: flex;
+    grid-area: drawer;
+    background-color: var(--asideColor);
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    display: flex;
 }
 
 .layout section {
-  grid-area: body;
-  display: flex;
+    grid-area: body;
+    background-color: var(--sectionColor);
+    color: white;
 }

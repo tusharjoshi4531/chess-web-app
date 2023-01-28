@@ -1,18 +1,22 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { useNavigate } from "react-router";
 import FormLayout from "../components/layout/FormLayout";
 import { signup } from "../helper/user-auth";
-
-import styles from "./SignupPage.module.css";
+import { UserContext } from "../store/user-context";
 
 const SignupPage = () => {
     const formLayoutStyles: React.CSSProperties = {
         maxWidth: "400px",
-        margin: "auto",
+        margin: "32px auto",
     };
+
+    const navigate = useNavigate();
 
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
+
+    const { updateUserInfo } = useContext(UserContext);
 
     const signupSuccessHandler = (
         username: string,
@@ -20,12 +24,8 @@ const SignupPage = () => {
         user_id: string,
         token: string
     ) => {
-        console.log({
-            username,
-            email,
-            user_id,
-            token,
-        });
+        updateUserInfo(username, email, user_id, token);
+        navigate("/");
     };
 
     const signupErrorHandler = (message: string) => {
@@ -85,14 +85,12 @@ const SignupPage = () => {
     );
 
     return (
-        <div className={styles.container}>
-            <FormLayout
-                title="Signup"
-                content={formContent}
-                actions={formActions}
-                style={formLayoutStyles}
-            />
-        </div>
+        <FormLayout
+            title="Signup"
+            content={formContent}
+            actions={formActions}
+            style={formLayoutStyles}
+        />
     );
 };
 

@@ -1,0 +1,22 @@
+.container {
+    background-color: white;
+    color: black;
+    padding: 16px;
+    margin: 32px;
+    border-radius: 8px;
+}
+
+.container h2 {
+    margin: 8px 0px;
+}
+
+.divider {
+    border: 1px solid black;
+}
+
+.data {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    margin-top: 8px;
+    gap: 4px;
+}

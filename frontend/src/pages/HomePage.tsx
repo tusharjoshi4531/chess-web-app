@@ -1,29 +1,85 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState, useCallback } from "react";
+import ChallengesLayout from "../components/layout/ChallengesLayout";
 import FormLayout from "../components/layout/FormLayout";
 import HomePageLayout from "../components/layout/HomePageLayout";
 import ButtonGroup from "../components/ui/ButtonGroup";
 import InputGroup from "../components/ui/InputGroup";
+import {
+    ChallengeRequestCallback,
+    ChallengeRequestData as ChallengeData,
+    RequestErrorCallback,
+    SelectedColor,
+} from "../global/types";
+import { addChallenge, getChallenges } from "../helper/challenge-api";
 import { UserContext } from "../store/user-context";
 
 const HomePage = () => {
-    const { userId } = useContext(UserContext);
+    const { userId, username } = useContext(UserContext);
 
-    const challengeNameInputRef = useRef<HTMLInputElement>(null);
-    const timeInputRef = useRef<HTMLInputElement>(null);
-    const incrementInputRef = useRef<HTMLInputElement>(null);
+    const challengeNameInputRef = useRef<HTMLInputElement>(null!);
+    const timeInputRef = useRef<HTMLInputElement>(null!);
+    const incrementInputRef = useRef<HTMLInputElement>(null!);
 
-    const [selectedColor, setSelectedColor] = useState<undefined | string>();
+    const [challenges, setChallenges] = useState<ChallengeData[]>([]);
 
-    const colorSelectHandler = (selected: string) => {
+    const [selectedColor, setSelectedColor] =
+        useState<SelectedColor | undefined>();
+
+    const colorSelectHandler = (selected: SelectedColor) => {
         setSelectedColor(selected);
     };
 
-    const formSubmitHandler = () => {
-        const challengeName = challengeNameInputRef.current?.value;
-        const time = timeInputRef.current?.value;
-        const increment = incrementInputRef.current?.value;
+    const getChallangesSuccessHandler = useCallback<ChallengeRequestCallback>(
+        (challenges) => {
+            setChallenges(
+                challenges.filter(({ creator }) => creator !== username)
+            );
+        },
+        [username]
+    );
 
-        console.log({ challengeName, time, increment, selectedColor });
+    const getChallengesErrorHandler = useCallback<RequestErrorCallback>(
+        (message) => {
+            alert(message);
+        },
+        []
+    );
+
+    useEffect(() => {
+        getChallenges(getChallangesSuccessHandler, getChallengesErrorHandler);
+    }, [getChallangesSuccessHandler, getChallengesErrorHandler]);
+
+    const formSubmitHandler = () => {
+        const challengeName = challengeNameInputRef.current.value.trim();
+        const time = parseInt(timeInputRef.current.value);
+        const increment = parseInt(incrementInputRef.current.value);
+
+        const isValid =
+            challengeName &&
+            challengeName.length > 5 &&
+            !isNaN(time) &&
+            !isNaN(increment) &&
+            time >= 1 &&
+            increment >= 0 &&
+            selectedColor;
+
+        if (!isValid) {
+            alert("Invalid challenge details");
+            return;
+        }
+
+        console.log(userId, username, challengeName, selectedColor, increment);
+
+        addChallenge(userId, username, challengeName, selectedColor!, {
+            time,
+            increment,
+        })
+            .then((res) => {
+                alert(res);
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
     };
 
     if (userId === "") {
@@ -69,27 +125,34 @@ const HomePage = () => {
                                     />,
                                 ]}
                             />
-                            <ButtonGroup
+                            <ButtonGroup<SelectedColor>
                                 buttonsInfo={[
                                     {
                                         text: "Black",
+                                        val: "Black",
                                     },
                                     {
                                         text: "Any",
+                                        val: "Any",
                                     },
                                     {
                                         text: "White",
+                                        val: "White",
                                     },
                                 ]}
                                 onSelect={colorSelectHandler}
                             />
                         </>
                     }
-                    actions={<button type="submit" onClick={formSubmitHandler}>Create</button>}
+                    actions={
+                        <button type="submit" onClick={formSubmitHandler}>
+                            Create
+                        </button>
+                    }
                     style={createChallengeFormStyles}
                 />
             }
-            challenges={"challanges"}
+            challenges={<ChallengesLayout challenges={challenges} />}
         />
     );
 };

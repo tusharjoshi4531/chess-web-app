@@ -1,34 +1,35 @@
 import { useState } from "react";
 import styles from "./ButtonGroup.module.css";
 
-type ButtonInfo = {
+type ButtonInfo<T> = {
     text: string;
+    val: T;
     onClick?: () => void;
 };
 
-type ButtonGroupProps = {
-    buttonsInfo: ButtonInfo[];
-    onSelect?: (selected: string) => void;
+type ButtonGroupProps<T> = {
+    buttonsInfo: ButtonInfo<T>[];
+    onSelect?: (selected: T) => void;
 };
 
-const ButtonGroup = ({ buttonsInfo, onSelect }: ButtonGroupProps) => {
-    const [selected, setSelected] = useState<string | undefined>("white");
+const ButtonGroup = <T,>({ buttonsInfo, onSelect }: ButtonGroupProps<T>) => {
+    const [selected, setSelected] = useState<T | undefined>();
 
-    const buttonComponents = buttonsInfo.map(({ onClick, text }) => {
+    const buttonComponents = buttonsInfo.map(({ onClick, text, val }) => {
         const onButtonClick = () => {
-            setSelected(text);
+            setSelected(val);
             if (onClick) onClick();
-            if (onSelect) onSelect(text);
+            if (onSelect) onSelect(val);
             // console.log(text);
         };
 
-        console.log(selected, text, selected === text);
+        // console.log(selected, text, selected === val);
 
         return (
             <button
                 onClick={onButtonClick}
                 className={
-                    selected === text ? styles.selected : styles.unselected
+                    selected === val ? styles.selected : styles.unselected
                 }
                 key={text}
             >

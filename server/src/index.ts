@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
+import { challengeRouter } from "./routes/challengeRoutes";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(
 app.use(express.json());
 
 app.use("/users", userRouter);
+app.use("/challenges", challengeRouter)
 
 mongoose.set("strictQuery", false);
 mongoose

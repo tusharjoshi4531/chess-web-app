@@ -27,6 +27,8 @@ export type BoardChange = [number, Piece, Piece];
 
 export type Move = BoardChange[];
 
+export type SelectedColor = "Black" | "White" | "Any";
+
 export type UserRequestData = {
     user: {
         username: string;
@@ -38,6 +40,19 @@ export type UserRequestData = {
     token: string;
 };
 
+export type ChallengeRequestData = {
+    _id: string;
+    creatorId: string;
+    creator: string;
+    name: string;
+    creatorColor: "Black" | "White" | "Any";
+    timeControl: {
+        time: number;
+        increment: number;
+    };
+    status: "pending" | "ongoing" | "finished";
+};
+
 export type UserRequestCallback = (
     username: string,
     email: string,
@@ -45,4 +60,8 @@ export type UserRequestCallback = (
     token: string
 ) => void;
 
-export type RequestErrorCallback = (message: string) => void
+export type ChallengeRequestCallback = (
+    challenges: ChallengeRequestData[]
+) => void;
+
+export type RequestErrorCallback = (message: string) => void;

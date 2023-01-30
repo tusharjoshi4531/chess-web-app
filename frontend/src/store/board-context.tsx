@@ -36,6 +36,7 @@ import { updateBoard } from "../helper/update-board";
 
 type BoardContextData = {
     moveNumber: number;
+    boardState: BoardState;
     isOnCurrentMove: () => boolean;
     setMoveNumber: React.Dispatch<React.SetStateAction<number>>;
     onChoseSquare: (
@@ -59,6 +60,7 @@ type BoardProviderProps = {
 
 export const BoardContext = createContext<BoardContextData>({
     moveNumber: 0,
+    boardState: [...initialBoardState],
     isOnCurrentMove: () => true,
     setMoveNumber: () => {},
     addMove: () => {},
@@ -69,7 +71,7 @@ export const BoardContext = createContext<BoardContextData>({
 });
 
 export const BoardProvider = ({ children }: BoardProviderProps) => {
-    const [boardState, setBoardState] = useState<BoardState>(initialBoardState);
+    const [boardState, setBoardState] = useState<BoardState>([...initialBoardState]);
     const [chosenSquare, setChosenSquare] = useState<Square | null>(null);
     const [enPassentSquare, setEnPassentSquare] = useState<Square | null>(null);
     const [turn, setTurn] = useState<Color>(0);
@@ -227,6 +229,7 @@ export const BoardProvider = ({ children }: BoardProviderProps) => {
 
     const values: BoardContextData = {
         moveNumber,
+        boardState,
         isOnCurrentMove,
         setMoveNumber,
         onChoseSquare,

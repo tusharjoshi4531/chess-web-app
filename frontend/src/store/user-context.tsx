@@ -1,11 +1,19 @@
-import { createContext, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { createContext, useEffect, useState } from "react";
+import { SERVER_URL } from "../global/strings";
 
 type UserContextData = {
     username: string;
     email: string;
     userId: string;
     token: string;
-    updateUserInfo: (username: string, email:string, user_id: string, token: string) => void;
+    socket: Socket | undefined;
+    updateUserInfo: (
+        username: string,
+        email: string,
+        user_id: string,
+        token: string
+    ) => void;
 };
 
 export const UserContext = createContext<UserContextData>({
@@ -13,6 +21,7 @@ export const UserContext = createContext<UserContextData>({
     email: "",
     userId: "",
     token: "",
+    socket: undefined,
     updateUserInfo: () => {},
 });
 
@@ -26,6 +35,27 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const [userId, setUserId] = useState("");
     const [token, setToken] = useState("");
 
+    const [socketState, setSocketState] = useState<Socket>();
+
+    useEffect(() => {
+        const socket = io(SERVER_URL, {
+            autoConnect: false,
+        });
+        socket.connect();
+        
+        socket.on("challenge-accepted", (roomId: string) => {
+            socket.emit("challenge-accepted-repy", roomId);
+        })
+
+        setSocketState(socket);
+
+        return () => {
+            if (socket) {
+                socket.close();
+            }
+        };
+    }, []);
+
     const updateUserInfo = (
         username: string,
         email: string,
@@ -38,7 +68,14 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         setToken(token);
     };
 
-    const value: UserContextData = { username, userId, token, email, updateUserInfo };
+    const value: UserContextData = {
+        username,
+        userId,
+        token,
+        email,
+        socket: socketState,
+        updateUserInfo,
+    };
 
     return (
         <UserContext.Provider value={value}>{children}</UserContext.Provider>

@@ -10,12 +10,12 @@ const LoginPage = () => {
         margin: "32px auto",
     };
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
 
-    const { updateUserInfo } = useContext(UserContext);
+    const { updateUserInfo, socket } = useContext(UserContext);
 
     const loginSuccessHandler = (
         username: string,
@@ -24,6 +24,7 @@ const LoginPage = () => {
         token: string
     ) => {
         updateUserInfo(username, email, user_id, token);
+        if (socket) socket.emit("connect-user", { username, id: user_id });
         navigate("/");
     };
 

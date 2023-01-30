@@ -16,7 +16,7 @@ const SignupPage = () => {
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
 
-    const { updateUserInfo } = useContext(UserContext);
+    const { updateUserInfo, socket } = useContext(UserContext);
 
     const signupSuccessHandler = (
         username: string,
@@ -25,6 +25,7 @@ const SignupPage = () => {
         token: string
     ) => {
         updateUserInfo(username, email, user_id, token);
+        if (socket) socket.emit("connect-user");
         navigate("/");
     };
 

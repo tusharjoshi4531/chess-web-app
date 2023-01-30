@@ -3,12 +3,12 @@ import styles from "./ChallengeHolder.module.css";
 
 type ChallengeHolderProps = {
     challengeData: ChallengeData;
-    onClick?: (challengeData: ChallengeData) => void;
+    onClick: (challengeData: ChallengeData) => void;
 };
 
 const ChallengeHolder = ({ challengeData, onClick }: ChallengeHolderProps) => {
     return (
-        <div className={styles.container}>
+        <div className={styles.container} onClick={() => onClick(challengeData)}>
             <h2>{challengeData.name}</h2>
             <div className={styles.divider} />
             <div className={styles.data}>

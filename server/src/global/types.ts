@@ -33,6 +33,15 @@ export type ChallengeSchema = {
     status: "pending" | "ongoing" | "finished";
 }
 
+export type ChallengeData = {
+    challengeId: string;
+    id: string;
+    username: string;
+    name: string;
+    creatorColor: "Black" | "Any" | "White";
+    timeControl: TimeControl;
+}
+
 export interface IAuthToken {
     username: string;
     email: string;
@@ -40,3 +49,4 @@ export interface IAuthToken {
 }
 
 export const TEMP_SECRET_KEY = "abc";
+

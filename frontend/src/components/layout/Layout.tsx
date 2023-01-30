@@ -11,7 +11,7 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
     const navigate = useNavigate();
-    const { updateUserInfo } = useContext(UserContext);
+    const { updateUserInfo, socket } = useContext(UserContext);
 
     const homeClickHandler = () => {
         navigate("/");
@@ -35,6 +35,7 @@ const Layout = ({ children }: LayoutProps) => {
 
     const logoutClickHandler = () => {
         updateUserInfo("", "", "", "");
+        socket?.emit("disconnect-user")
         navigate("/");
     };
 

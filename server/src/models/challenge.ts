@@ -1,12 +1,12 @@
 import { model, Schema } from "mongoose";
-import { IChallenge, IChallengeSchema, TimeControl } from "../global/types";
+import { ChallengeSchema, TimeControl } from "../global/types";
 
 const TimeControlSchema = new Schema<TimeControl>({
     time: { type: Number, required: true },
     increment: { type: Number, required: true },
 });
 
-const ChallengeSchema = new Schema<IChallengeSchema>({
+const ChallengeSchema = new Schema<ChallengeSchema>({
     creatorId: {type: String, required: true},
     creator: { type: String, required: true },
     name: {type: String, required: true},
@@ -15,6 +15,6 @@ const ChallengeSchema = new Schema<IChallengeSchema>({
     status: {type: String, required: true},
 });
 
-const ChallengeModel = model<IChallenge>("Challenge", ChallengeSchema);
+const ChallengeModel = model<ChallengeSchema>("Challenge", ChallengeSchema);
 
 export default ChallengeModel

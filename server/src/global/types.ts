@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export type User = {
     username: string;
     email: string;
@@ -14,14 +16,27 @@ export type TimeControl = {
     increment: number;
 };
 
-export interface IChallenge {
-    creatorId: string;
-    creator: string;
+export type Challenge = {
+    id: string;
+    username: string;
     name: string;
     creatorColor: "Black" | "Any" | "White";
     timeControl: TimeControl;
 }
 
-export interface IChallengeSchema extends IChallenge {
+export type ChallengeSchema = {
+    creatorId: string;
+    creator: string;
+    name: string;
+    creatorColor: "Black" | "Any" | "White";
+    timeControl: TimeControl;
     status: "pending" | "ongoing" | "finished";
 }
+
+export interface IAuthToken {
+    username: string;
+    email: string;
+    id: string;
+}
+
+export const TEMP_SECRET_KEY = "abc";

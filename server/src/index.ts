@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
 import { challengeRouter } from "./routes/challengeRoutes";
+import { authenticateToken } from "./middleware/authentication";
+import { Server } from "socket.io";
+import { createServer } from "http";
 
 const app = express();
 
@@ -15,7 +18,7 @@ app.use(
 app.use(express.json());
 
 app.use("/users", userRouter);
-app.use("/challenges", challengeRouter)
+app.use("/challenges", authenticateToken, challengeRouter);
 
 mongoose.set("strictQuery", false);
 mongoose
@@ -29,6 +32,13 @@ mongoose
         console.log(error);
     });
 
-app.listen(8080, () => {
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+    },
+});
+
+httpServer.listen(8080, () => {
     console.log("Listening at 8080");
 });

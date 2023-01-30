@@ -3,9 +3,7 @@ import UserModel from "../models/user";
 import { Request } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { SignInUser, User } from "../global/types";
-
-const TEMP_SECRET_KEY = "abc";
+import { SignInUser, TEMP_SECRET_KEY, User } from "../global/types";
 
 export const signup: RequestHandler = async (
     req: Request<{}, {}, User>,
@@ -35,6 +33,7 @@ export const signup: RequestHandler = async (
         const token = jwt.sign(
             {
                 email: result.email,
+                username: result.username,
                 id: result._id,
             },
             TEMP_SECRET_KEY
@@ -73,6 +72,7 @@ export const signin: RequestHandler = async (
         const token = jwt.sign(
             {
                 email: existingUser.email,
+                username: existingUser.username,
                 id: existingUser._id,
             },
             TEMP_SECRET_KEY

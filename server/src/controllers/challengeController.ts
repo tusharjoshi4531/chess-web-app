@@ -1,16 +1,18 @@
 import { Request, RequestHandler } from "express";
-import { IChallenge, IChallengeSchema } from "../global/types";
+import { Challenge } from "../global/types";
 import ChallengeModel from "../models/challenge";
 
 export const addChallenge: RequestHandler = async (
-    req: Request<{}, {}, IChallengeSchema>,
+    req: Request<{}, {}, Challenge>,
     res
 ) => {
     // Check if challenge name exists
-    const { creator } = req.body;
+    const { username, id, name, creatorColor, timeControl } = req.body;
 
     try {
-        const existingChallenge = await ChallengeModel.findOne({ creator });
+        const existingChallenge = await ChallengeModel.findOne({
+            creator: username,
+        });
 
         if (existingChallenge) {
             return res
@@ -18,10 +20,18 @@ export const addChallenge: RequestHandler = async (
                 .json({ message: "Creator has already created a challenge" });
         }
 
-        const result = await ChallengeModel.create({
-            ...req.body,
+        const newChallenge = {
+            creator: username,
+            creatorId: id,
+            creatorColor: creatorColor,
+            timeControl: timeControl,
+            name: name,
             status: "pending",
-        });
+        };
+
+        console.log(newChallenge);
+
+        const result = await ChallengeModel.create(newChallenge);
 
         res.status(201).json({ message: "Successfully added challenge" });
     } catch (error) {

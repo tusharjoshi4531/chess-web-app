@@ -7,8 +7,7 @@ import {
 } from "../global/types";
 
 export const addChallenge = async (
-    creatorId: string,
-    creator: string,
+    accessToken: string,
     name: string,
     creatorColor: "Black" | "White" | "Any",
     timeControl: { time: number; increment: number }
@@ -16,7 +15,8 @@ export const addChallenge = async (
     try {
         const response = await axios.post<{ message: string }>(
             `${SERVER_URL}/challenges/add`,
-            { creatorId, creator, name, creatorColor, timeControl }
+            { name, creatorColor, timeControl },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
         );
 
         return response.data.message;
@@ -30,19 +30,23 @@ export const addChallenge = async (
     }
 };
 
-export const getChallenges =  async (
+export const getChallenges = async (
+    accessToken: string,
     callback?: ChallengeRequestCallback,
     errorCallback?: RequestErrorCallback
 ) => {
     try {
         const response = await axios.get<ChallengeRequestData[]>(
-            `${SERVER_URL}/challenges/get`
+            `${SERVER_URL}/challenges/get`,
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            }
         );
-        if(callback) callback(response.data);
+        if (callback) callback(response.data);
     } catch (error) {
         console.log(error);
-        if(axios.isAxiosError(error)){
-            if(errorCallback) errorCallback(error.response?.data)
+        if (axios.isAxiosError(error)) {
+            if (errorCallback) errorCallback(error.response?.data.message);
         }
     }
 };

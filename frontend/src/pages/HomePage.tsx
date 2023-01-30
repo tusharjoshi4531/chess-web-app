@@ -14,7 +14,7 @@ import { addChallenge, getChallenges } from "../helper/challenge-api";
 import { UserContext } from "../store/user-context";
 
 const HomePage = () => {
-    const { userId, username } = useContext(UserContext);
+    const { userId, username, token } = useContext(UserContext);
 
     const challengeNameInputRef = useRef<HTMLInputElement>(null!);
     const timeInputRef = useRef<HTMLInputElement>(null!);
@@ -46,8 +46,14 @@ const HomePage = () => {
     );
 
     useEffect(() => {
-        getChallenges(getChallangesSuccessHandler, getChallengesErrorHandler);
-    }, [getChallangesSuccessHandler, getChallengesErrorHandler]);
+        if (token !== "") {
+            getChallenges(
+                token,
+                getChallangesSuccessHandler,
+                getChallengesErrorHandler
+            );
+        }
+    }, [getChallangesSuccessHandler, getChallengesErrorHandler, token]);
 
     const formSubmitHandler = () => {
         const challengeName = challengeNameInputRef.current.value.trim();
@@ -70,7 +76,7 @@ const HomePage = () => {
 
         console.log(userId, username, challengeName, selectedColor, increment);
 
-        addChallenge(userId, username, challengeName, selectedColor!, {
+        addChallenge(token, challengeName, selectedColor!, {
             time,
             increment,
         })

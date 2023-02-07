@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { UserContext } from "../../store/user-context";
+import Modal from "../ui/Modal";
 import Header from "./Header";
 import styles from "./Layout.module.css";
 import NavigationDrawer from "./NavigationDrawer";
@@ -11,7 +12,8 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
     const navigate = useNavigate();
-    const { updateUserInfo, socket } = useContext(UserContext);
+    const { socket, challengeData, roomId, updateUserInfo, setChallengeData } =
+        useContext(UserContext);
 
     const homeClickHandler = () => {
         navigate("/");
@@ -35,28 +37,57 @@ const Layout = ({ children }: LayoutProps) => {
 
     const logoutClickHandler = () => {
         updateUserInfo("", "", "", "");
-        socket?.emit("disconnect-user")
+        socket?.emit("disconnect-user");
         navigate("/");
     };
 
+    const modalConfirmHandler = () => {
+        if (socket) {
+            socket.emit(
+                "challenge-accepted",
+                challengeData,
+                (message: string) => {
+                    alert(message);
+                }
+            );
+        }
+    };
+
+    const modalCancelHandler = () => {
+        // console.log("cancel");
+        setChallengeData(undefined);
+    };
+
     return (
-        <div className={styles.layout}>
-            <header>
-                <Header
-                    onClickLogin={loginClickHandler}
-                    onClickSignup={signupClickHandler}
-                    onClickLogout={logoutClickHandler}
-                />
-            </header>
-            <aside>
-                <NavigationDrawer
-                    onClickHome={homeClickHandler}
-                    onClickBoard={boardClickHandler}
-                    onClickGame={gameClickHandler}
-                />
-            </aside>
-            <section>{children}</section>
-        </div>
+        <>
+            {challengeData !== undefined && roomId === "" && (
+                <Modal
+                    confirm="Accept"
+                    cancel="Decline"
+                    onConfirm={modalConfirmHandler}
+                    onCancel={modalCancelHandler}
+                >
+                    <h2>{challengeData?.challenger} has challenged you</h2>
+                </Modal>
+            )}
+            <div className={styles.layout}>
+                <header>
+                    <Header
+                        onClickLogin={loginClickHandler}
+                        onClickSignup={signupClickHandler}
+                        onClickLogout={logoutClickHandler}
+                    />
+                </header>
+                <aside>
+                    <NavigationDrawer
+                        onClickHome={homeClickHandler}
+                        onClickBoard={boardClickHandler}
+                        onClickGame={gameClickHandler}
+                    />
+                </aside>
+                <section>{children}</section>
+            </div>
+        </>
     );
 };
 

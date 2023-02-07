@@ -1,6 +1,12 @@
 import { io, Socket } from "socket.io-client";
 import { createContext, useEffect, useState } from "react";
 import { SERVER_URL } from "../global/strings";
+import { IChallengeSocketData } from "../global/types";
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
+
+interface IChallengeContextData extends IChallengeSocketData {
+    accepted: boolean;
+}
 
 type UserContextData = {
     username: string;
@@ -8,12 +14,17 @@ type UserContextData = {
     userId: string;
     token: string;
     socket: Socket | undefined;
+    challengeData: IChallengeContextData | undefined;
+    roomId: string;
     updateUserInfo: (
         username: string,
         email: string,
         user_id: string,
         token: string
     ) => void;
+    setChallengeData: React.Dispatch<
+        React.SetStateAction<IChallengeContextData | undefined>
+    >;
 };
 
 export const UserContext = createContext<UserContextData>({
@@ -22,7 +33,10 @@ export const UserContext = createContext<UserContextData>({
     userId: "",
     token: "",
     socket: undefined,
+    challengeData: undefined,
+    roomId: "",
     updateUserInfo: () => {},
+    setChallengeData: () => {},
 });
 
 type UserProviderProps = {
@@ -34,6 +48,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const [email, setEmail] = useState("");
     const [userId, setUserId] = useState("");
     const [token, setToken] = useState("");
+    const [challengeData, setChallengeData] =
+        useState<IChallengeContextData | undefined>();
+    const [roomId, setRoomId] = useState("");
 
     const [socketState, setSocketState] = useState<Socket>();
 
@@ -42,10 +59,28 @@ export const UserProvider = ({ children }: UserProviderProps) => {
             autoConnect: false,
         });
         socket.connect();
-        
-        socket.on("challenge-accepted", (roomId: string) => {
-            socket.emit("challenge-accepted-repy", roomId);
-        })
+
+        socket.on("challenge", (data: IChallengeSocketData) => {
+            setChallengeData({ ...data, accepted: false });
+        });
+
+        socket.on(
+            "challenge-created",
+            ({
+                roomName,
+                data,
+            }: {
+                roomName: string;
+                data: IChallengeSocketData;
+            }) => {
+                alert("challenge Created");
+                setRoomId(roomName);
+
+                console.log(data);
+
+                setChallengeData({ ...data, accepted: true });
+            }
+        );
 
         setSocketState(socket);
 
@@ -71,10 +106,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const value: UserContextData = {
         username,
         userId,
+        challengeData,
+        roomId,
         token,
         email,
         socket: socketState,
         updateUserInfo,
+        setChallengeData,
     };
 
     return (

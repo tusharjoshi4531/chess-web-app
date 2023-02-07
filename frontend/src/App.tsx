@@ -11,20 +11,22 @@ import { useContext } from "react";
 import HomePage from "./pages/HomePage";
 
 function App() {
-    const { userId } = useContext(UserContext);
+    const { userId, roomId } = useContext(UserContext);
 
     return (
         <Layout>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route
-                    path="/game"
-                    element={
-                        <BoardProvider>
-                            <GamePage />
-                        </BoardProvider>
-                    }
-                />
+                {roomId !== "" && (
+                    <Route
+                        path="/game"
+                        element={
+                            <BoardProvider>
+                                <GamePage />
+                            </BoardProvider>
+                        }
+                    />
+                )}
                 <Route
                     path="/board"
                     element={

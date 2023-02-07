@@ -65,3 +65,17 @@ export type ChallengeRequestCallback = (
 ) => void;
 
 export type RequestErrorCallback = (message: string) => void;
+
+export type TimeControl = {
+    time: number,
+    increment: number,
+}
+
+export interface IChallengeSocketData {
+    black: string;
+    white: string;
+    challenger: string;
+    challengee: string;
+    isAny: boolean;
+    timeControl: TimeControl;
+};

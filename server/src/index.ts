@@ -4,9 +4,9 @@ import cors from "cors";
 import { userRouter } from "./routes/userRoutes";
 import { challengeRouter } from "./routes/challengeRoutes";
 import { authenticateToken } from "./middleware/authentication";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { createServer } from "http";
-import { Challenge, ChallengeData } from "./global/types";
+import { Challenge, ChallengeData, ChallengeSocketData } from "./global/types";
 
 const app = express();
 
@@ -43,16 +43,17 @@ const io = new Server(httpServer, {
     },
 });
 
-const userIdToSocketId = new Map<string, string>();
 const socketIdToUserId = new Map<string, string>();
-const userIdToUserName = new Map<string, string>();
+const userIdToUsername = new Map<string, string>();
+const usernameToUserId = new Map<string, string>();
+
+const userIdToSocket = new Map<string, Socket>();
+
 const rooms = new Map<
     string,
     {
         white: string;
         black: string;
-        black_time: { minuites: number; seconds: number };
-        white_time: { minuites: number; seconds: number };
     }
 >();
 
@@ -60,45 +61,121 @@ const disconnectUser = (socketId: string) => {
     const userId = socketIdToUserId.get(socketId);
 
     socketIdToUserId.delete(socketId);
-    if (userId) {
-        userIdToUserName.delete(userId);
-        userIdToSocketId.delete(userId);
-    }
+
+    if (!userId) return;
+
+    userIdToUsername.delete(userId);
+    userIdToSocket.delete(userId);
+
+    const username = userIdToUsername.get(userId);
+    if (!username) return;
+
+    usernameToUserId.delete(username);
 };
 
-const connectUser = (socketId: string, userId: string, username: string) => {
-    userIdToSocketId.set(userId, socketId);
-    socketIdToUserId.set(socketId, userId);
-    userIdToUserName.set(userId, username);
+const connectUser = (socket: Socket, userId: string, username: string) => {
+    userIdToSocket.set(userId, socket);
+    socketIdToUserId.set(socket.id, userId);
+    userIdToUsername.set(userId, username);
+    usernameToUserId.set(username, userId);
+
+    console.log(userIdToSocket);
+    console.log(socketIdToUserId);
+    console.log(userIdToUsername);
+    console.log(usernameToUserId);
 };
 
 io.on("connection", (socket) => {
     console.log(`${socket.id} connected`);
 
     socket.on("connect-user", (data: { username: string; id: string }) => {
-        connectUser(socket.id, data.id, data.username);
+        connectUser(socket, data.id, data.username);
     });
 
-    socket.on("accept-challenge", (data: ChallengeData, callback) => {
-        console.log(data);
-        if (userIdToSocketId.has(data.id)) {
-
-            const roomId = data.challengeId;
-            socket.join(roomId);
-
-            socket.to(userIdToSocketId.get(data.id)!).emit("challenge-accepted", roomId);
-
-            callback(true);
-        } else {
-            callback(false);
+    socket.on("challenge", (data: ChallengeSocketData, callback) => {
+        if (
+            !usernameToUserId.has(data.challengee) ||
+            !usernameToUserId.has(data.challenger)
+        ) {
+            callback("Could not send challenge");
+            return;
         }
+
+        const challengeeId = usernameToUserId.get(data.challengee);
+
+        if (!userIdToSocket.has(challengeeId!)) {
+            callback("Cannot find socket object");
+            return;
+        }
+
+        const challengeeSocketId = userIdToSocket.get(challengeeId!)!.id;
+
+        socket.to(challengeeSocketId!).emit("challenge", data);
+
+        callback("Challenge Sent");
     });
 
-    socket.on("challenge-accepted-repy", (roomId) => {
-        socket.join(roomId);
+    socket.on("challenge-accepted", (data: ChallengeSocketData, callback) => {
+        console.log(data.challenger, data.challengee);
+        if (
+            !usernameToUserId.has(data.challenger) ||
+            !usernameToUserId.has(data.challengee)
+        ) {
+            callback("Users not online");
+            return;
+        }
 
-        console.log(socket.rooms);
-    })
+        const challengerId = usernameToUserId.get(data.challenger);
+        const challengeeId = usernameToUserId.get(data.challengee);
+
+        if (
+            !userIdToSocket.has(challengeeId!) ||
+            !userIdToSocket.has(challengerId!)
+        ) {
+            callback("Socket object not found");
+            return;
+        }
+
+        const challengerSocket = userIdToSocket.get(challengerId!)!;
+        const challengeeSocket = userIdToSocket.get(challengeeId!)!;
+
+        const roomName = `${challengerId}&${challengeeId}`;
+
+        rooms.set(roomName, {
+            white: challengerSocket.id,
+            black: challengeeSocket.id,
+        });
+
+        challengeeSocket
+            .to(challengerSocket.id)
+            .emit("challenge-created", { roomName, data });
+        challengerSocket
+            .to(challengeeSocket.id)
+            .emit("challenge-created", { roomName, data });
+
+        console.log(rooms);
+    });
+
+    // socket.on("accept-challenge", (data: ChallengeData, callback) => {
+    //     console.log(data);
+    //     if (userIdToSocketId.has(data.id)) {
+
+    //         const roomId = data.challengeId;
+    //         socket.join(roomId);
+
+    //         socket.to(userIdToSocketId.get(data.id)!).emit("challenge-accepted", roomId);
+
+    //         callback(true);
+    //     } else {
+    //         callback(false);
+    //     }
+    // });
+
+    // socket.on("challenge-accepted-repy", (roomId) => {
+    //     socket.join(roomId);
+
+    //     console.log(socket.rooms);
+    // })
 
     socket.on("disconnect-user", () => {
         disconnectUser(socket.id);

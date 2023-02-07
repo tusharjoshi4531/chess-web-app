@@ -22,7 +22,7 @@ export type Challenge = {
     name: string;
     creatorColor: "Black" | "Any" | "White";
     timeControl: TimeControl;
-}
+};
 
 export type ChallengeSchema = {
     creatorId: string;
@@ -31,7 +31,7 @@ export type ChallengeSchema = {
     creatorColor: "Black" | "Any" | "White";
     timeControl: TimeControl;
     status: "pending" | "ongoing" | "finished";
-}
+};
 
 export type ChallengeData = {
     challengeId: string;
@@ -40,7 +40,16 @@ export type ChallengeData = {
     name: string;
     creatorColor: "Black" | "Any" | "White";
     timeControl: TimeControl;
-}
+};
+
+export type ChallengeSocketData = {
+    black: string;
+    white: string;
+    challenger: string;
+    challengee: string;
+    isAny: boolean;
+    timeControl: TimeControl;
+};
 
 export interface IAuthToken {
     username: string;
@@ -49,4 +58,3 @@ export interface IAuthToken {
 }
 
 export const TEMP_SECRET_KEY = "abc";
-

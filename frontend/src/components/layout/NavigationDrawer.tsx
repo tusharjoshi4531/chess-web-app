@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { UserContext } from "../../store/user-context";
 import NavigationDrawerButton from "../ui/NavigationDrawerButton";
 import styles from "./NavigationDrawer.module.css";
 
@@ -12,14 +14,18 @@ const NavigationDrawer = ({
     onClickGame,
     onClickBoard,
 }: NavigationDrawerProps) => {
+    const { roomId } = useContext(UserContext);
+
     return (
         <div className={styles.container}>
             <NavigationDrawerButton onClick={onClickHome}>
                 Home
             </NavigationDrawerButton>
-            <NavigationDrawerButton onClick={onClickGame}>
-                Game
-            </NavigationDrawerButton>
+            {roomId && (
+                <NavigationDrawerButton onClick={onClickGame}>
+                    Game
+                </NavigationDrawerButton>
+            )}
             <NavigationDrawerButton onClick={onClickBoard}>
                 Board
             </NavigationDrawerButton>

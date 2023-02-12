@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { createContext, useEffect, useState } from "react";
 import { SERVER_URL } from "../global/strings";
 import { IChallengeSocketData } from "../global/types";
-import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
+import { useNavigate } from "react-router";
 
 interface IChallengeContextData extends IChallengeSocketData {
     accepted: boolean;
@@ -54,6 +54,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
     const [socketState, setSocketState] = useState<Socket>();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const socket = io(SERVER_URL, {
             autoConnect: false,
@@ -90,6 +92,12 @@ export const UserProvider = ({ children }: UserProviderProps) => {
             }
         };
     }, []);
+
+    useEffect(() => {
+        if (roomId !== "") {
+            navigate("/Game");
+        }
+    }, [roomId, navigate]);
 
     const updateUserInfo = (
         username: string,

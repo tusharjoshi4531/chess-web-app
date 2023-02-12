@@ -6,11 +6,11 @@ import {
 import { useBoard } from "../hooks/board-hook"
 
 
-type BoardProviderProps = {
+type GameProviderProps = {
     children: React.ReactNode;
 };
 
-export const BoardContext = createContext<BoardData>({
+export const GameContext = createContext<BoardData>({
     moveNumber: 0,
     boardState: [...initialBoardState],
     isOnCurrentMove: () => true,
@@ -22,11 +22,11 @@ export const BoardContext = createContext<BoardData>({
     goToLastMove: () => {},
 });
 
-export const BoardProvider = ({ children }: BoardProviderProps) => {
+export const GameProvider = ({ children }: GameProviderProps) => {
     
     const values = useBoard()
 
     return (
-        <BoardContext.Provider value={values}>{children}</BoardContext.Provider>
+        <GameContext.Provider value={values}>{children}</GameContext.Provider>
     );
 };

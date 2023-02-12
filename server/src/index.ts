@@ -73,7 +73,15 @@ const disconnectUser = (socketId: string) => {
     usernameToUserId.delete(username);
 };
 
-const connectUser = (socket: Socket, userId: string, username: string) => {
+const connectUser = (
+    socket: Socket,
+    userId: string,
+    username: string
+): boolean => {
+    if (userIdToSocket.has(userId)) {
+        return false;
+    }
+
     userIdToSocket.set(userId, socket);
     socketIdToUserId.set(socket.id, userId);
     userIdToUsername.set(userId, username);
@@ -83,14 +91,25 @@ const connectUser = (socket: Socket, userId: string, username: string) => {
     console.log(socketIdToUserId);
     console.log(userIdToUsername);
     console.log(usernameToUserId);
+
+    return true;
 };
 
 io.on("connection", (socket) => {
     console.log(`${socket.id} connected`);
 
-    socket.on("connect-user", (data: { username: string; id: string }) => {
-        connectUser(socket, data.id, data.username);
-    });
+
+    
+    socket.on(
+        "connect-user",
+        (data: { username: string; id: string }, callback) => {
+            if(!connectUser(socket, data.id, data.username)){
+                callback(false);
+            }else{
+                callback(true);
+            }
+        }
+    );
 
     socket.on("challenge", (data: ChallengeSocketData, callback) => {
         if (

@@ -23,9 +23,17 @@ const LoginPage = () => {
         user_id: string,
         token: string
     ) => {
-        updateUserInfo(username, email, user_id, token);
-        if (socket) socket.emit("connect-user", { username, id: user_id });
-        navigate("/");
+        if (socket) {
+            socket.emit("connect-user", { username, id: user_id }, (status: boolean) => {
+                if (status) {
+                    alert("User Connected");
+                    updateUserInfo(username, email, user_id, token);
+                    navigate("/");
+                } else {
+                    alert("User already logged in");
+                }
+            });
+        }
     };
 
     const loginErrorHandler = (message: string) => {

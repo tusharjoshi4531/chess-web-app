@@ -3,7 +3,7 @@ import ChessBoard from "../components/game/ChessBoard";
 import BoardStatus from "../components/layout/BoardStatus";
 import ChangeMoveLayout from "../components/layout/ChangeMoveLayout";
 import GameLayout from "../components/layout/GameLayout";
-import { Move, Square } from "../global/types";
+import { Move, Square, WHITE } from "../global/types";
 import { BoardContext } from "../store/board-context";
 
 const BoardPage = () => {
@@ -38,7 +38,7 @@ const BoardPage = () => {
     <GameLayout
       game={
         <>
-          <ChessBoard size={600} onCellClick={cellClickHandler} />
+          <ChessBoard size={600} onCellClick={cellClickHandler} color={WHITE} />
           <ChangeMoveLayout />
         </>
       }

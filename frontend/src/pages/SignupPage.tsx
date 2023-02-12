@@ -24,8 +24,21 @@ const SignupPage = () => {
         user_id: string,
         token: string
     ) => {
+        if (socket)
+            socket.emit(
+                "connect-user",
+                { username, id: user_id },
+                (status: boolean) => {
+                    if (status) {
+                        alert("User Connected");
+                        updateUserInfo(username, email, user_id, token);
+                        navigate("/");
+                    } else {
+                        alert("User already logged in");
+                    }
+                }
+            );
         updateUserInfo(username, email, user_id, token);
-        if (socket) socket.emit("connect-user");
         navigate("/");
     };
 

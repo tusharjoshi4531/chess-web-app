@@ -79,3 +79,23 @@ export interface IChallengeSocketData {
     isAny: boolean;
     timeControl: TimeControl;
 };
+
+export type BoardData = {
+    moveNumber: number;
+    boardState: BoardState;
+    isOnCurrentMove: () => boolean;
+    setMoveNumber: React.Dispatch<React.SetStateAction<number>>;
+    onChoseSquare: (
+        file: number,
+        rank: number,
+        onMoveFinish?: (
+            move: Move,
+            prevSquare?: Square | undefined,
+            currentSquare?: Square | undefined
+        ) => void
+    ) => void;
+    addMove: (move: Move) => void;
+    changeMove: (targetMoveNumber: number) => void;
+    goToFirstMove: () => void;
+    goToLastMove: () => void;
+};

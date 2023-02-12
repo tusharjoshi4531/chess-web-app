@@ -4,6 +4,7 @@ import Layout from "./components/layout/Layout";
 import { Navigate, Route, Routes } from "react-router";
 import BoardPage from "./pages/BoardPage";
 import { BoardProvider } from "./store/board-context";
+import { GameProvider } from './store/game-context'
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { UserContext } from "./store/user-context";
@@ -21,9 +22,9 @@ function App() {
                     <Route
                         path="/game"
                         element={
-                            <BoardProvider>
+                            <GameProvider>
                                 <GamePage />
-                            </BoardProvider>
+                            </GameProvider>
                         }
                     />
                 )}

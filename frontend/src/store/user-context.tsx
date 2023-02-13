@@ -1,8 +1,8 @@
-import { io, Socket } from "socket.io-client";
-import { createContext, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
+import { createContext, useState } from "react";
 import { SERVER_URL } from "../global/strings";
-import { IChallengeSocketData } from "../global/types";
-import { useNavigate } from "react-router";
+import { IChallengeSocketData, SocketConnectFunction } from "../global/types";
+import { useSocket } from "../hooks/socket-hook";
 
 interface IChallengeContextData extends IChallengeSocketData {
     accepted: boolean;
@@ -25,6 +25,8 @@ type UserContextData = {
     setChallengeData: React.Dispatch<
         React.SetStateAction<IChallengeContextData | undefined>
     >;
+    setRoomId: React.Dispatch<React.SetStateAction<string>>;
+    connect: SocketConnectFunction,
 };
 
 export const UserContext = createContext<UserContextData>({
@@ -37,6 +39,8 @@ export const UserContext = createContext<UserContextData>({
     roomId: "",
     updateUserInfo: () => {},
     setChallengeData: () => {},
+    setRoomId: () => {},
+    connect: () => {},
 });
 
 type UserProviderProps = {
@@ -44,6 +48,10 @@ type UserProviderProps = {
 };
 
 export const UserProvider = ({ children }: UserProviderProps) => {
+    const { socket, connect } = useSocket(SERVER_URL, {
+        autoConnect: false,
+    });
+
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [userId, setUserId] = useState("");
@@ -52,52 +60,23 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         useState<IChallengeContextData | undefined>();
     const [roomId, setRoomId] = useState("");
 
-    const [socketState, setSocketState] = useState<Socket>();
+    // useEffect(() => {
+    //     connect(
+    //         (data: IChallengeSocketData) => {
+    //             setChallengeData({ ...data, accepted: false });
+    //         },
+    //         (roomName: string, data: IChallengeSocketData) => {
+    //             alert("challenge Created");
+    //             setRoomId(roomName);
 
-    const navigate = useNavigate();
+    //             console.log(data);
 
-    useEffect(() => {
-        const socket = io(SERVER_URL, {
-            autoConnect: false,
-        });
-        socket.connect();
+    //             setChallengeData({ ...data, accepted: true });
 
-        socket.on("challenge", (data: IChallengeSocketData) => {
-            setChallengeData({ ...data, accepted: false });
-        });
-
-        socket.on(
-            "challenge-created",
-            ({
-                roomName,
-                data,
-            }: {
-                roomName: string;
-                data: IChallengeSocketData;
-            }) => {
-                alert("challenge Created");
-                setRoomId(roomName);
-
-                console.log(data);
-
-                setChallengeData({ ...data, accepted: true });
-            }
-        );
-
-        setSocketState(socket);
-
-        return () => {
-            if (socket) {
-                socket.close();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (roomId !== "") {
-            navigate("/Game");
-        }
-    }, [roomId, navigate]);
+    //             navigate("/Game");
+    //         }
+    //     );
+    // }, [navigate, connect]);
 
     const updateUserInfo = (
         username: string,
@@ -118,9 +97,11 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         roomId,
         token,
         email,
-        socket: socketState,
+        socket,
         updateUserInfo,
         setChallengeData,
+        setRoomId,
+        connect,
     };
 
     return (

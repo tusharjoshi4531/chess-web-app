@@ -3,8 +3,6 @@ import GamePage from "./pages/GamePage";
 import Layout from "./components/layout/Layout";
 import { Navigate, Route, Routes } from "react-router";
 import BoardPage from "./pages/BoardPage";
-import { BoardProvider } from "./store/board-context";
-import { GameProvider } from './store/game-context'
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { UserContext } from "./store/user-context";
@@ -18,24 +16,8 @@ function App() {
         <Layout>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                {roomId !== "" && (
-                    <Route
-                        path="/game"
-                        element={
-                            <GameProvider>
-                                <GamePage />
-                            </GameProvider>
-                        }
-                    />
-                )}
-                <Route
-                    path="/board"
-                    element={
-                        <BoardProvider>
-                            <BoardPage />
-                        </BoardProvider>
-                    }
-                />
+                {roomId !== "" && <Route path="/game" element={<GamePage />} />}
+                <Route path="/board" element={<BoardPage />} />
                 {userId === "" && (
                     <>
                         <Route path="/login" element={<LoginPage />} />

@@ -67,9 +67,9 @@ export type ChallengeRequestCallback = (
 export type RequestErrorCallback = (message: string) => void;
 
 export type TimeControl = {
-    time: number,
-    increment: number,
-}
+    time: number;
+    increment: number;
+};
 
 export interface IChallengeSocketData {
     black: string;
@@ -78,11 +78,11 @@ export interface IChallengeSocketData {
     challengee: string;
     isAny: boolean;
     timeControl: TimeControl;
-};
+}
 
-export type BoardData = {
+export type UseBoardData = {
     moveNumber: number;
-    boardState: BoardState;
+    turn: Color;
     isOnCurrentMove: () => boolean;
     setMoveNumber: React.Dispatch<React.SetStateAction<number>>;
     onChoseSquare: (
@@ -98,4 +98,20 @@ export type BoardData = {
     changeMove: (targetMoveNumber: number) => void;
     goToFirstMove: () => void;
     goToLastMove: () => void;
+    setNewMoves: (newMoves: Move[], moveOnce: boolean) => void;
 };
+
+export type ChallengeReceiveEvent = (data: IChallengeSocketData) => void;
+
+export type ChallengeCreatedEvent = (
+    roomName: string,
+    data: IChallengeSocketData
+) => void;
+
+export type MoveMadeEvent = (moves: Move[], displayMoves: string[]) => void;
+
+export type SocketConnectFunction = (
+    onChallengeReceived: ChallengeReceiveEvent,
+    onChallengeCreated: ChallengeCreatedEvent,
+    onMoveMade: MoveMadeEvent
+) => void;

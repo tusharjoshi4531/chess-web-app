@@ -57,4 +57,14 @@ export interface IAuthToken {
     id: string;
 }
 
+export type Piece = null | 0 | 1 | 3 | 2 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+export type BoardChange = [number, Piece, Piece];
+export type Move = BoardChange[];
+export type MoveMadeData = {
+    moves: Move[];
+    displayMoves: string[];
+    color: string;
+    room: string;
+};
+
 export const TEMP_SECRET_KEY = "abc";

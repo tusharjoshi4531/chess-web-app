@@ -6,7 +6,7 @@ import { challengeRouter } from "./routes/challengeRoutes";
 import { authenticateToken } from "./middleware/authentication";
 import { Server, Socket } from "socket.io";
 import { createServer } from "http";
-import { Challenge, ChallengeData, ChallengeSocketData } from "./global/types";
+import { ChallengeSocketData, MoveMadeData } from "./global/types";
 
 const app = express();
 
@@ -87,7 +87,9 @@ const connectUser = (
     userIdToUsername.set(userId, username);
     usernameToUserId.set(username, userId);
 
-    console.log(userIdToSocket);
+    userIdToSocket.forEach((value, key) => {
+        console.log(key);
+    });
     console.log(socketIdToUserId);
     console.log(userIdToUsername);
     console.log(usernameToUserId);
@@ -98,14 +100,12 @@ const connectUser = (
 io.on("connection", (socket) => {
     console.log(`${socket.id} connected`);
 
-
-    
     socket.on(
         "connect-user",
         (data: { username: string; id: string }, callback) => {
-            if(!connectUser(socket, data.id, data.username)){
+            if (!connectUser(socket, data.id, data.username)) {
                 callback(false);
-            }else{
+            } else {
                 callback(true);
             }
         }
@@ -175,6 +175,26 @@ io.on("connection", (socket) => {
         console.log(rooms);
     });
 
+    socket.on("move-made", (data: MoveMadeData, callback) => {
+        if (!rooms.has(data.room)) {
+            callback(false);
+            return;
+        }
+        
+        const targetId = rooms.get(data.room)![
+            data.color === "white" ? "black" : "white"
+        ];
+
+        console.log(`move made in room ${data.room} to ${targetId}`);
+        
+        socket
+            .to(targetId)
+            .emit("move-made", {
+                moves: data.moves,
+                displayMoves: data.displayMoves,
+            });
+    });
+
     // socket.on("accept-challenge", (data: ChallengeData, callback) => {
     //     console.log(data);
     //     if (userIdToSocketId.has(data.id)) {
@@ -201,6 +221,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
+        console.log(`${socket.id} has disconnected`);
         disconnectUser(socket.id);
     });
 });

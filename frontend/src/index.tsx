@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { UserProvider } from "./store/user-context";
+import { GameProvider } from "./store/game-context";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
@@ -12,7 +13,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <BrowserRouter>
         <UserProvider>
-            <App />
+            <GameProvider>
+                <App />
+            </GameProvider>
         </UserProvider>
     </BrowserRouter>
 );

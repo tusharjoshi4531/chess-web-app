@@ -2,6 +2,7 @@ import { useContext, useRef } from "react";
 import { useNavigate } from "react-router";
 import FormLayout from "../components/layout/FormLayout";
 import { login } from "../helper/user-auth";
+import { GameContext } from "../store/game-context";
 import { UserContext } from "../store/user-context";
 
 const LoginPage = () => {
@@ -15,7 +16,10 @@ const LoginPage = () => {
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
 
-    const { updateUserInfo, socket } = useContext(UserContext);
+    const { updateUserInfo, socket, connect, setChallengeData, setRoomId } =
+        useContext(UserContext);
+    const { setGameDisplayMoves, gameMethods } = useContext(GameContext);
+    const { setNewMoves } = gameMethods;
 
     const loginSuccessHandler = (
         username: string,
@@ -24,15 +28,41 @@ const LoginPage = () => {
         token: string
     ) => {
         if (socket) {
-            socket.emit("connect-user", { username, id: user_id }, (status: boolean) => {
-                if (status) {
-                    alert("User Connected");
-                    updateUserInfo(username, email, user_id, token);
-                    navigate("/");
-                } else {
-                    alert("User already logged in");
+            connect(
+                (data) => {
+                    setChallengeData({ ...data, accepted: false });
+                },
+                (roomName, data) => {
+                    alert("challenge Created");
+                    setRoomId(roomName);
+
+                    console.log(data);
+
+                    setChallengeData({ ...data, accepted: true });
+
+                    navigate("/Game");
+                },
+                (moves, displayMoves) => {
+                    setGameDisplayMoves(displayMoves);
+                    setNewMoves(moves, true);
+                    console.log(displayMoves);
                 }
-            });
+            );
+            socket.emit(
+                "connect-user",
+                { username, id: user_id },
+                (status: boolean) => {
+                    if (status) {
+                        // alert("User Connected")
+                        updateUserInfo(username, email, user_id, token);
+                        navigate("/");
+                    } else {
+                        alert("User already logged in");
+                    }
+                }
+            );
+        } else {
+            alert("Not connected to websocket");
         }
     };
 

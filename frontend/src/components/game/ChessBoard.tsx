@@ -1,17 +1,15 @@
-import { useContext } from "react";
-import { Color, WHITE } from "../../global/types";
-import { BoardContext } from "../../store/board-context";
+import { BoardState, Color, WHITE } from "../../global/types";
 import styles from "./ChessBoard.module.css";
 import ChessBoardCell from "./ChessBoardCell";
 
 type ChessBoardProps = {
     size: number;
     color: Color;
+    boardState: BoardState;
     onCellClick: (file: number, rank: number) => void;
 };
 
-const ChessBoard = ({ size, color, onCellClick }: ChessBoardProps) => {
-    const { boardState } = useContext(BoardContext);
+const ChessBoard = ({ size, color, boardState, onCellClick }: ChessBoardProps) => {
 
     const cells: JSX.Element[] = [];
     for (let i = 0; i < 8; i++) {

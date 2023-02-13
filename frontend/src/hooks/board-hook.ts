@@ -19,7 +19,7 @@ import {
     W_Q,
     W_R,
     BoardChange,
-    BoardData
+    UseBoardData,
 } from "../global/types";
 import { moveBack, moveForward } from "../helper/change-move";
 import {
@@ -33,22 +33,23 @@ import {
 } from "../helper/check-piece";
 import { updateBoard } from "../helper/update-board";
 
-export const useBoard : () => BoardData = () => {
-    const [boardState, setBoardState] = useState<BoardState>([
-        [W_R, W_N, W_B, W_Q, W_K, W_B, W_N, W_R],
-        [W_P, W_P, W_P, W_P, W_P, W_P, W_P, W_P],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [B_P, B_P, B_P, B_P, B_P, B_P, B_P, B_P],
-        [B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R],
-    ]);
+export type UseBoard = (
+    boardState: BoardState,
+    setBoardState: React.Dispatch<React.SetStateAction<BoardState>>,
+    moves: Move[],
+    setMoves: React.Dispatch<React.SetStateAction<Move[]>>
+) => UseBoardData;
+
+export const useBoard: UseBoard = (
+    boardState,
+    setBoardState,
+    moves,
+    setMoves
+) => {
     const [chosenSquare, setChosenSquare] = useState<Square | null>(null);
     const [enPassentSquare, setEnPassentSquare] = useState<Square | null>(null);
     const [turn, setTurn] = useState<Color>(0);
     const [moveNumber, setMoveNumber] = useState<number>(0);
-    const [moves, setMoves] = useState<Move[]>([]);
 
     const isOnCurrentMove = () => moves.length === moveNumber;
 
@@ -199,9 +200,24 @@ export const useBoard : () => BoardData = () => {
         }
     };
 
+    const setNewMoves = (newMoves: Move[], moveOnce: boolean) => {
+        if (
+            moveNumber === moves.length &&
+            moveOnce &&
+            newMoves.length > moves.length
+        ) {
+            moveForward(moveNumber + 1, moveNumber, boardState, newMoves);
+            setMoveNumber((state) => state + 1);
+        }
+        if ((newMoves.length - moves.length) % 2 !== 0) {
+            setTurn((state) => (state === WHITE ? BLACK : WHITE));
+        }
+        setMoves(newMoves);
+    };
+
     return {
         moveNumber,
-        boardState,
+        turn,
         isOnCurrentMove,
         setMoveNumber,
         onChoseSquare,
@@ -209,5 +225,6 @@ export const useBoard : () => BoardData = () => {
         changeMove,
         goToFirstMove,
         goToLastMove,
-    }
-}
+        setNewMoves,
+    };
+};

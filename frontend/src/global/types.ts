@@ -80,7 +80,11 @@ export interface IChallengeSocketData {
     timeControl: TimeControl;
 }
 
-export type UseBoardData = {
+export interface IUseBoardData {
+    boardState: BoardState;
+    setBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
+    moves: Move[];
+    setMoves: React.Dispatch<React.SetStateAction<Move[]>>;
     moveNumber: number;
     turn: Color;
     isOnCurrentMove: () => boolean;
@@ -98,8 +102,12 @@ export type UseBoardData = {
     changeMove: (targetMoveNumber: number) => void;
     goToFirstMove: () => void;
     goToLastMove: () => void;
-    setNewMoves: (newMoves: Move[], moveOnce: boolean) => void;
-};
+    setNewMoves: (
+        newMoves: Move[],
+        moveOnce: boolean,
+        playerColor: Color
+    ) => void;
+}
 
 export type ChallengeReceiveEvent = (data: IChallengeSocketData) => void;
 
@@ -112,6 +120,15 @@ export type MoveMadeEvent = (moves: Move[], displayMoves: string[]) => void;
 
 export type SocketConnectFunction = (
     onChallengeReceived: ChallengeReceiveEvent,
-    onChallengeCreated: ChallengeCreatedEvent,
-    onMoveMade: MoveMadeEvent
+    onChallengeCreated: ChallengeCreatedEvent
 ) => void;
+
+export type SocketMethods = {
+    addChallengeReceivedEvent: (
+        onChallengeReceived: ChallengeReceiveEvent
+    ) => void;
+    addChallengeCreatedEvent: (
+        onChallengeCreated: ChallengeCreatedEvent
+    ) => void;
+    addMoveMadeEvent: (onMoveMade: MoveMadeEvent) => void;
+};

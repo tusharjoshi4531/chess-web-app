@@ -137,39 +137,36 @@ io.on("connection", (socket) => {
     socket.on("challenge-accepted", (data: ChallengeSocketData, callback) => {
         console.log(data.challenger, data.challengee);
         if (
-            !usernameToUserId.has(data.challenger) ||
-            !usernameToUserId.has(data.challengee)
+            !usernameToUserId.has(data.black) ||
+            !usernameToUserId.has(data.white)
         ) {
             callback("Users not online");
             return;
         }
 
-        const challengerId = usernameToUserId.get(data.challenger);
-        const challengeeId = usernameToUserId.get(data.challengee);
+        const blackId = usernameToUserId.get(data.black);
+        const whiteId = usernameToUserId.get(data.white);
 
-        if (
-            !userIdToSocket.has(challengeeId!) ||
-            !userIdToSocket.has(challengerId!)
-        ) {
+        if (!userIdToSocket.has(blackId!) || !userIdToSocket.has(whiteId!)) {
             callback("Socket object not found");
             return;
         }
 
-        const challengerSocket = userIdToSocket.get(challengerId!)!;
-        const challengeeSocket = userIdToSocket.get(challengeeId!)!;
+        const blackSocket = userIdToSocket.get(blackId!)!;
+        const whiteSocket = userIdToSocket.get(whiteId!)!;
 
-        const roomName = `${challengerId}&${challengeeId}`;
+        const roomName = `${whiteId}&${blackId}`;
 
         rooms.set(roomName, {
-            white: challengerSocket.id,
-            black: challengeeSocket.id,
+            white: whiteSocket.id,
+            black: blackSocket.id,
         });
 
-        challengeeSocket
-            .to(challengerSocket.id)
+        whiteSocket
+            .to(blackSocket.id)
             .emit("challenge-created", { roomName, data });
-        challengerSocket
-            .to(challengeeSocket.id)
+        blackSocket
+            .to(whiteSocket.id)
             .emit("challenge-created", { roomName, data });
 
         console.log(rooms);
@@ -180,19 +177,17 @@ io.on("connection", (socket) => {
             callback(false);
             return;
         }
-        
+
         const targetId = rooms.get(data.room)![
             data.color === "white" ? "black" : "white"
         ];
 
         console.log(`move made in room ${data.room} to ${targetId}`);
-        
-        socket
-            .to(targetId)
-            .emit("move-made", {
-                moves: data.moves,
-                displayMoves: data.displayMoves,
-            });
+
+        socket.to(targetId).emit("move-made", {
+            moves: data.moves,
+            displayMoves: data.displayMoves,
+        });
     });
 
     // socket.on("accept-challenge", (data: ChallengeData, callback) => {

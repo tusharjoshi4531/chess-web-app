@@ -2,8 +2,11 @@ import { io } from "socket.io-client";
 import { useCallback, useEffect, useRef } from "react";
 import { ManagerOptions, SocketOptions } from "socket.io-client";
 import {
+    ChallengeCreatedEvent,
+    ChallengeReceiveEvent,
     IChallengeSocketData,
     Move,
+    MoveMadeEvent,
     SocketConnectFunction,
 } from "../global/types";
 
@@ -22,45 +25,57 @@ export const useSocket = (
         []
     );
 
-    const connect: SocketConnectFunction = useCallback(
-        (onChallengeReceived, onChallengeCreated, onMoveMade) => {
-            socketRef.current.connect();
+    const connect = () => {
+        socketRef.current.connect();
+    };
 
-            socketRef.current.on("challenge", (data: IChallengeSocketData) => {
-                onChallengeReceived(data);
-            });
+    const addChallengeReceivedEvent = (
+        onChallengeReceived: ChallengeReceiveEvent
+    ) => {
+        socketRef.current.on("challenge", (data: IChallengeSocketData) => {
+            onChallengeReceived(data);
+        });
+    };
 
-            socketRef.current.on(
-                "challenge-created",
-                ({
-                    roomName,
-                    data,
-                }: {
-                    roomName: string;
-                    data: IChallengeSocketData;
-                }) => {
-                    onChallengeCreated(roomName, data);
-                }
-            );
+    const addChallengeCreatedEvent = (
+        onChallengeCreated: ChallengeCreatedEvent
+    ) => {
+        socketRef.current.on(
+            "challenge-created",
+            ({
+                roomName,
+                data,
+            }: {
+                roomName: string;
+                data: IChallengeSocketData;
+            }) => {
+                onChallengeCreated(roomName, data);
+            }
+        );
+    };
 
-            socketRef.current.on(
-                "move-made",
-                ({
-                    moves,
-                    displayMoves,
-                }: {
-                    moves: Move[];
-                    displayMoves: string[];
-                }) => {
-                    onMoveMade(moves, displayMoves);
-                }
-            );
-        },
-        [socketRef]
-    );
+    const addMoveMadeEvent = (onMoveMade: MoveMadeEvent) => {
+        socketRef.current.on(
+            "move-made",
+            ({
+                moves,
+                displayMoves,
+            }: {
+                moves: Move[];
+                displayMoves: string[];
+            }) => {
+                onMoveMade(moves, displayMoves);
+            }
+        );
+    };
 
     return {
         socket: socketRef.current,
         connect,
+        methods : {
+            addChallengeCreatedEvent,
+            addChallengeReceivedEvent,
+            addMoveMadeEvent,
+        },
     };
 };

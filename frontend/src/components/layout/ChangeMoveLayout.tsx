@@ -1,10 +1,10 @@
 import styles from "./ChangeMoveLayout.module.css";
 
 import ChangeMoveButton from "../ui/ChangeMoveButton";
-import { UseBoardData } from "../../global/types";
+import { IUseBoardData } from "../../global/types";
 
 type ChangeMoveLayoutProps = {
-    boardMethods: UseBoardData;
+    boardMethods: IUseBoardData;
 };
 
 const ChangeMoveLayout = ({ boardMethods }: ChangeMoveLayoutProps) => {

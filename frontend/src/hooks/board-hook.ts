@@ -19,7 +19,7 @@ import {
     W_Q,
     W_R,
     BoardChange,
-    UseBoardData,
+    IUseBoardData,
 } from "../global/types";
 import { moveBack, moveForward } from "../helper/change-move";
 import {
@@ -33,25 +33,29 @@ import {
 } from "../helper/check-piece";
 import { updateBoard } from "../helper/update-board";
 
-export type UseBoard = (
-    boardState: BoardState,
-    setBoardState: React.Dispatch<React.SetStateAction<BoardState>>,
-    moves: Move[],
-    setMoves: React.Dispatch<React.SetStateAction<Move[]>>
-) => UseBoardData;
+export type UseBoard = () => IUseBoardData;
 
-export const useBoard: UseBoard = (
-    boardState,
-    setBoardState,
-    moves,
-    setMoves
-) => {
+export const useBoard: UseBoard = () => {
+    const [boardState, setBoardState] = useState<BoardState>([
+        [W_R, W_N, W_B, W_Q, W_K, W_B, W_N, W_R],
+        [W_P, W_P, W_P, W_P, W_P, W_P, W_P, W_P],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null, null],
+        [B_P, B_P, B_P, B_P, B_P, B_P, B_P, B_P],
+        [B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R],
+    ]);
+    const [moves, setMoves] = useState<Move[]>([]);
     const [chosenSquare, setChosenSquare] = useState<Square | null>(null);
     const [enPassentSquare, setEnPassentSquare] = useState<Square | null>(null);
     const [turn, setTurn] = useState<Color>(0);
     const [moveNumber, setMoveNumber] = useState<number>(0);
 
-    const isOnCurrentMove = () => moves.length === moveNumber;
+    const isOnCurrentMove = () => {
+        console.log("isOnCurrentMove ", moveNumber, moves);
+        return moves.length === moveNumber;
+    };
 
     const addMove = (move: Move) => {
         setMoves((state) => [...state, move]);
@@ -200,22 +204,34 @@ export const useBoard: UseBoard = (
         }
     };
 
-    const setNewMoves = (newMoves: Move[], moveOnce: boolean) => {
-        if (
-            moveNumber === moves.length &&
-            moveOnce &&
-            newMoves.length > moves.length
-        ) {
-            moveForward(moveNumber + 1, moveNumber, boardState, newMoves);
-            setMoveNumber((state) => state + 1);
+    const setNewMoves = (
+        newMoves: Move[],
+        moveTillEnd: boolean,
+        playerColor: Color
+    ) => {
+        console.log({ set: "set", moveNumber, moves, newMoves });
+
+        let currentMoveNumber = moveNumber;
+
+        while (currentMoveNumber < newMoves.length && moveTillEnd) {
+            currentMoveNumber++;
+            moveForward(currentMoveNumber, moveNumber, boardState, newMoves);
         }
-        if ((newMoves.length - moves.length) % 2 !== 0) {
-            setTurn((state) => (state === WHITE ? BLACK : WHITE));
-        }
+        setMoveNumber(currentMoveNumber);
+        console.log(newMoves);
+        console.log(moves);
+        console.log(newMoves.length - moves.length);
+
+        setTurn(playerColor);
+
         setMoves(newMoves);
     };
 
     return {
+        boardState,
+        setBoardState,
+        moves,
+        setMoves,
         moveNumber,
         turn,
         isOnCurrentMove,

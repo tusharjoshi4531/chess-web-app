@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
 import { useNavigate } from "react-router";
 import FormLayout from "../components/layout/FormLayout";
+import { BLACK, WHITE } from "../global/types";
 import { login } from "../helper/user-auth";
 import { GameContext } from "../store/game-context";
 import { UserContext } from "../store/user-context";
@@ -16,8 +17,15 @@ const LoginPage = () => {
     const emailInputRef = useRef<HTMLInputElement>(null);
     const passwordInputRef = useRef<HTMLInputElement>(null);
 
-    const { updateUserInfo, socket, connect, setChallengeData, setRoomId } =
-        useContext(UserContext);
+    const {
+        updateUserInfo,
+        socket,
+        connect,
+        setChallengeData,
+        setRoomId,
+        challengeData,
+        methods,
+    } = useContext(UserContext);
     const { setGameDisplayMoves, gameMethods } = useContext(GameContext);
     const { setNewMoves } = gameMethods;
 
@@ -28,26 +36,23 @@ const LoginPage = () => {
         token: string
     ) => {
         if (socket) {
-            connect(
-                (data) => {
-                    setChallengeData({ ...data, accepted: false });
-                },
-                (roomName, data) => {
-                    alert("challenge Created");
-                    setRoomId(roomName);
+            connect();
 
-                    console.log(data);
+            methods.addChallengeReceivedEvent((data) => {
+                setChallengeData({ ...data, accepted: false });
+            });
 
-                    setChallengeData({ ...data, accepted: true });
+            methods.addChallengeCreatedEvent((roomName, data) => {
+                alert("challenge Created");
+                setRoomId(roomName);
 
-                    navigate("/Game");
-                },
-                (moves, displayMoves) => {
-                    setGameDisplayMoves(displayMoves);
-                    setNewMoves(moves, true);
-                    console.log(displayMoves);
-                }
-            );
+                console.log(data);
+
+                setChallengeData({ ...data, accepted: true });
+
+                navigate("/Game");
+            });
+
             socket.emit(
                 "connect-user",
                 { username, id: user_id },

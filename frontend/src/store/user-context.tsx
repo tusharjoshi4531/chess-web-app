@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client";
 import { createContext, useState } from "react";
 import { SERVER_URL } from "../global/strings";
-import { IChallengeSocketData, SocketConnectFunction } from "../global/types";
+import { IChallengeSocketData, SocketMethods } from "../global/types";
 import { useSocket } from "../hooks/socket-hook";
 
 interface IChallengeContextData extends IChallengeSocketData {
@@ -26,7 +26,8 @@ type UserContextData = {
         React.SetStateAction<IChallengeContextData | undefined>
     >;
     setRoomId: React.Dispatch<React.SetStateAction<string>>;
-    connect: SocketConnectFunction,
+    connect: () => void,
+    methods: SocketMethods
 };
 
 export const UserContext = createContext<UserContextData>({
@@ -41,6 +42,7 @@ export const UserContext = createContext<UserContextData>({
     setChallengeData: () => {},
     setRoomId: () => {},
     connect: () => {},
+    methods: {} as SocketMethods,
 });
 
 type UserProviderProps = {
@@ -48,7 +50,7 @@ type UserProviderProps = {
 };
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-    const { socket, connect } = useSocket(SERVER_URL, {
+    const { socket, connect, methods } = useSocket(SERVER_URL, {
         autoConnect: false,
     });
 
@@ -102,6 +104,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         setChallengeData,
         setRoomId,
         connect,
+        methods,
     };
 
     return (

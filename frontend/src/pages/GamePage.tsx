@@ -43,6 +43,9 @@ const GamePage = () => {
 
         setMoves((state) => [...state, displayMove]);
 
+        console.log(updatedMoves);
+        console.log(updatedDisplayMoves);
+
         if (socket) {
             const color = challengeColor === WHITE ? "white" : "black";
 

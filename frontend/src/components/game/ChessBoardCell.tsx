@@ -28,6 +28,7 @@ import {
   BLACK,
   W_N,
   B_N,
+  Highlight,
 } from "../../global/types";
 
 type ChessBoardCellProps = {
@@ -38,7 +39,7 @@ type ChessBoardCellProps = {
   };
   displayRank?: boolean;
   displayFile?: boolean;
-  highlight?: "none" | "red" | "yellow" | "blue";
+  highlight?: Highlight;
   peice?: Piece;
   onClick: (file: number, rank: number) => void;
 };

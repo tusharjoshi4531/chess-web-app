@@ -7,8 +7,15 @@ import { Move, Square, WHITE } from "../global/types";
 import { GameContext } from "../store/game-context";
 
 const BoardPage = () => {
-    const { analysisBoardState: boardState, analysisMethods, analysisDisplayMoves: moves, setAnalysisDisplayMoves: setMoves } =
-        useContext(GameContext);
+    const {
+        analysisBoardState: boardState,
+        analysisMethods,
+        analysisDisplayMoves: moves,
+        setAnalysisDisplayMoves: setMoves,
+        analysisChosenSquare: chosenSquare,
+        analysisCheckSquare: checkeSquare,
+        analysisCheckmateSquare: checkmateSquare,
+    } = useContext(GameContext);
 
     const { isOnCurrentMove, onChoseSquare, addMove } = analysisMethods;
 
@@ -44,6 +51,9 @@ const BoardPage = () => {
                         onCellClick={cellClickHandler}
                         color={WHITE}
                         boardState={boardState}
+                        chosenSquare={chosenSquare}
+                        checkedSquare={checkeSquare}
+                        checkmateSquare={checkmateSquare}
                     />
                     <ChangeMoveLayout boardMethods={analysisMethods} />
                 </>

@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { IUseBoardData, BoardState, Move } from "../global/types";
+import { IUseBoardData, BoardState, Move, Square } from "../global/types";
 import { useBoard } from "../hooks/board-hook";
 
 type GameProviderProps = {
@@ -13,6 +13,12 @@ type GameContextData = {
     gameMoves: Move[];
     analysisDisplayMoves: string[];
     gameDisplayMoves: string[];
+    analysisChosenSquare: Square | null;
+    analysisCheckSquare: Square | null;
+    analysisCheckmateSquare: Square | null;
+    gameChosenSquare: Square | null;
+    gameCheckSquare: Square | null;
+    gameCheckmateSquare: Square | null;
     setAnalysisBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
     setGameBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
     setAnalysisMoves: React.Dispatch<React.SetStateAction<Move[]>>;
@@ -30,6 +36,12 @@ export const GameContext = createContext<GameContextData>({
     gameMoves: [],
     analysisDisplayMoves: [],
     gameDisplayMoves: [],
+    analysisChosenSquare: null,
+    analysisCheckSquare: null,
+    analysisCheckmateSquare: null,
+    gameChosenSquare: null,
+    gameCheckSquare: null,
+    gameCheckmateSquare: null,
     setAnalysisBoardState: () => {},
     setGameBoardState: () => {},
     setAnalysisMoves: () => {},
@@ -51,12 +63,18 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     const gameMethods = useBoard();
 
     const {
+        chosenSquare: analysisChosenSquare,
+        checkSquare: analysisCheckSquare,
+        checkmateSquare: analysisCheckmateSquare,
         boardState: analysisBoardState,
         setBoardState: setAnalysisBoardState,
         moves: analysisMoves,
         setMoves: setAnalysisMoves,
     } = analysisMethods;
     const {
+        chosenSquare: gameChosenSquare,
+        checkSquare: gameCheckSquare,
+        checkmateSquare: gameCheckmateSquare,
         boardState: gameBoardState,
         setBoardState: setGameBoardState,
         moves: gameMoves,
@@ -64,6 +82,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     } = gameMethods;
 
     const values = {
+        analysisChosenSquare,
+        analysisCheckSquare,
+        analysisCheckmateSquare,
+        gameChosenSquare,
+        gameCheckSquare,
+        gameCheckmateSquare,
         analysisBoardState,
         gameBoardState,
         analysisMoves,

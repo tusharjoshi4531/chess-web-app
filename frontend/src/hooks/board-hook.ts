@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     BLACK,
     BoardState,
@@ -31,6 +31,13 @@ import {
     checkQueen,
     checkRook,
 } from "../helper/check-piece";
+import {
+    getAttackingSquare,
+    getKingSquare,
+    getSquareStatus,
+    isSquareAttacked,
+    isSquareInCheckmate,
+} from "../helper/check-square-attacked";
 import { updateBoard } from "../helper/update-board";
 
 export type UseBoard = () => IUseBoardData;
@@ -47,13 +54,36 @@ export const useBoard: UseBoard = () => {
         [B_R, B_N, B_B, B_Q, B_K, B_B, B_N, B_R],
     ]);
     const [moves, setMoves] = useState<Move[]>([]);
+    const [moveNumber, setMoveNumber] = useState<number>(0);
     const [chosenSquare, setChosenSquare] = useState<Square | null>(null);
+    const [checkSquare, setCheckSquare] = useState<Square | null>(null);
+    const [checkmateSquare, setCheckmateSquare] = useState<Square | null>(null);
     const [enPassentSquare, setEnPassentSquare] = useState<Square | null>(null);
     const [turn, setTurn] = useState<Color>(0);
-    const [moveNumber, setMoveNumber] = useState<number>(0);
+
+    useEffect(() => {
+        const kingSquare = getKingSquare(boardState, turn);
+        if (!kingSquare) return;
+
+        const status = getSquareStatus(boardState, kingSquare, turn);
+
+        switch (status) {
+            case 1:
+                setCheckSquare(kingSquare);
+                break;
+            case 2:
+                setCheckSquare(kingSquare);
+                setCheckmateSquare(kingSquare);
+                break;
+            default:
+                setCheckSquare(null);
+                setCheckmateSquare(null);
+                break;
+        }
+    }, [turn]);
 
     const isOnCurrentMove = () => {
-        console.log("isOnCurrentMove ", moveNumber, moves);
+        // console.log("isOnCurrentMov÷e ", moveNumber, moves);
         return moves.length === moveNumber;
     };
 
@@ -229,11 +259,14 @@ export const useBoard: UseBoard = () => {
 
     return {
         boardState,
-        setBoardState,
         moves,
-        setMoves,
         moveNumber,
+        chosenSquare,
+        checkSquare,
+        checkmateSquare,
         turn,
+        setBoardState,
+        setMoves,
         isOnCurrentMove,
         setMoveNumber,
         onChoseSquare,

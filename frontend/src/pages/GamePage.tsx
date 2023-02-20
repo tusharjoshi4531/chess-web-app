@@ -14,6 +14,9 @@ const GamePage = () => {
         gameMethods,
         gameDisplayMoves: moves,
         setGameDisplayMoves: setMoves,
+        gameChosenSquare: chosenSquare,
+        gameCheckSquare: checkSquare,
+        gameCheckmateSquare: checkmateSquare,
         gameMoves,
     } = useContext(GameContext);
 
@@ -89,6 +92,9 @@ const GamePage = () => {
                         onCellClick={cellClickHandler}
                         color={challengeColor}
                         boardState={boardState}
+                        chosenSquare={chosenSquare}
+                        checkedSquare={checkSquare}
+                        checkmateSquare={checkmateSquare}
                     />
                     <Timer color="white" />
                 </>

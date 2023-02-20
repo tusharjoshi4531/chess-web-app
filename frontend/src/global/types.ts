@@ -15,6 +15,7 @@ export const BLACK = 1;
 
 export type Piece = null | 0 | 1 | 3 | 2 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 export type Color = 0 | 1;
+export type Highlight = "none" | "red" | "yellow" | "blue";
 
 export type BoardState = Piece[][];
 
@@ -82,11 +83,14 @@ export interface IChallengeSocketData {
 
 export interface IUseBoardData {
     boardState: BoardState;
-    setBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
     moves: Move[];
-    setMoves: React.Dispatch<React.SetStateAction<Move[]>>;
     moveNumber: number;
+    chosenSquare: Square | null;
+    checkSquare: Square | null;
+    checkmateSquare: Square | null;
     turn: Color;
+    setBoardState: React.Dispatch<React.SetStateAction<BoardState>>;
+    setMoves: React.Dispatch<React.SetStateAction<Move[]>>;
     isOnCurrentMove: () => boolean;
     setMoveNumber: React.Dispatch<React.SetStateAction<number>>;
     onChoseSquare: (

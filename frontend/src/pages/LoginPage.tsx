@@ -1,9 +1,7 @@
 import { useContext, useRef } from "react";
 import { useNavigate } from "react-router";
 import FormLayout from "../components/layout/FormLayout";
-import { BLACK, WHITE } from "../global/types";
 import { login } from "../helper/user-auth";
-import { GameContext } from "../store/game-context";
 import { UserContext } from "../store/user-context";
 
 const LoginPage = () => {
@@ -23,11 +21,8 @@ const LoginPage = () => {
         connect,
         setChallengeData,
         setRoomId,
-        challengeData,
         methods,
     } = useContext(UserContext);
-    const { setGameDisplayMoves, gameMethods } = useContext(GameContext);
-    const { setNewMoves } = gameMethods;
 
     const loginSuccessHandler = (
         username: string,

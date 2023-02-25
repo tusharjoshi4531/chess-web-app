@@ -17,7 +17,7 @@ const BoardPage = () => {
         analysisCheckmateSquare: checkmateSquare,
     } = useContext(GameContext);
 
-    const { isOnCurrentMove, onChoseSquare, addMove } = analysisMethods;
+    const { onChoseSquare, addMove } = analysisMethods;
 
     const squareToStringEquivalent = (square: Square) =>
         `${String.fromCharCode(square.file + 97)}${square.rank + 1}`;
@@ -27,6 +27,7 @@ const BoardPage = () => {
         prevSquare?: Square,
         currentSquare?: Square
     ) => {
+        console.log(move);
         addMove(move);
         if (prevSquare !== undefined && currentSquare !== undefined) {
             const move = `${squareToStringEquivalent(
@@ -37,8 +38,6 @@ const BoardPage = () => {
     };
 
     const cellClickHandler = (file: number, rank: number) => {
-        if (!isOnCurrentMove()) return;
-
         onChoseSquare(file, rank, moveFinishHandler);
     };
 

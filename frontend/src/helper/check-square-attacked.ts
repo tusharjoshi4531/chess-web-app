@@ -18,7 +18,33 @@ import {
     W_Q,
     W_R,
 } from "../global/types";
+import { iterateIntermediateSquares } from "./board-util";
 import { getColor } from "./check-piece";
+
+export const getInterceptingPieceSquares = (
+    boardState: BoardState,
+    initialSquare: Square,
+    targetSquare: Square,
+    color: Color
+): Square[] => {
+    const validSquares: Square[] = [];
+
+    iterateIntermediateSquares(initialSquare, targetSquare, (square) => {
+        const attackingSquares = getAttackingSquare(
+            boardState,
+            square,
+            (color ^ 1) as Color,
+            square.file === targetSquare.file &&
+                square.rank === targetSquare.rank
+        );
+
+        // console.log({ square, attackingSquares });
+
+        validSquares.push(...attackingSquares);
+    });
+
+    return validSquares;
+};
 
 export const getSquareStatus = (
     boardState: BoardState,
@@ -69,6 +95,14 @@ export const getKingSquare = (
     return null;
 };
 
+export const isSquareInCheck = (
+    boardState: BoardState,
+    square: Square,
+    color: Color
+): boolean => {
+    return getAttackingSquare(boardState, square, color).length > 0;
+};
+
 export const isSquareInCheckmate = (
     boardState: BoardState,
     kingSquare: Square,
@@ -90,11 +124,6 @@ export const isSquareInCheckmate = (
 
     const attackingSquare =
         attackingSquares.length !== 1 ? null : attackingSquares[0];
-
-    const attackingPiece =
-        attackingSquare === null
-            ? null
-            : boardState[attackingSquare.rank][attackingSquare.file];
 
     let isCheckmate: boolean = true;
     kingMoves.forEach(([drank, dfile]) => {
@@ -131,80 +160,43 @@ export const isSquareInCheckmate = (
         return isCheckmate;
     }
 
-    console.log({ attackingPiece, attackingSquare });
+    // console.log({ attackingPiece, attackingSquare });
 
-    if (
-        attackingPiece !== W_P &&
-        attackingPiece !== B_P &&
-        attackingPiece !== W_N &&
-        attackingPiece !== B_N
-    ) {
-        const dirFile = Math.sign(attackingSquare.file - file);
-        const dirRank = Math.sign(attackingSquare.file - rank);
-
-        let currFile = file;
-        let currRank = rank;
-        console.log({
-            attackingSquare,
-            attackingPiece,
-            kingSquare,
-            currFile,
-            currRank,
-            dirFile,
-            dirRank,
-        });
-
-        while (
-            currFile !== attackingSquare.file &&
-            currRank !== attackingSquare.rank
-        ) {
-            currFile += dirFile;
-            currRank += dirRank;
-
-            const currAttackingSquares = getAttackingSquare(
-                boardState,
-                { file: currFile, rank: currRank },
-                color === WHITE ? BLACK : WHITE
-            ).filter(
-                (square) =>
-                    square.file !== kingSquare.file ||
-                    square.rank !== kingSquare.rank
-            );
-
-            if (currAttackingSquares.length > 0) {
-                isCheckmate = false;
-                break;
-            }
-        }
-    }
-
-    if (
-        (attackingPiece === W_N || attackingPiece === B_N) &&
-        isSquareAttacked(
+    iterateIntermediateSquares(kingSquare, attackingSquare, (square) => {
+        const interceptingPieceSquares = getAttackingSquare(
             boardState,
-            attackingSquare,
+            square,
             color === WHITE ? BLACK : WHITE
-        )
-    ) {
-        isCheckmate = false;
-    }
+        ).filter(
+            (val) =>
+                val.file !== kingSquare.file || val.rank !== kingSquare.rank
+        );
 
+        if (interceptingPieceSquares.length > 0) {
+            isCheckmate = false;
+        }
+    });
     return isCheckmate;
 };
 
 export const getAttackingSquare = (
     boardState: BoardState,
     cordinate: Square,
-    color: Color
+    color: Color,
+    blocking: boolean = false,
 ): Square[] => {
     const attackedSquare: Square[] = [];
 
     attackedSquare.push(...getRookAttacks(boardState, cordinate, color));
     attackedSquare.push(...getBishopAttacks(boardState, cordinate, color));
-    attackedSquare.push(...getPawnAttacks(boardState, cordinate, color));
     attackedSquare.push(...getQueenAttacks(boardState, cordinate, color));
     attackedSquare.push(...getKnightAttacks(boardState, cordinate, color));
     attackedSquare.push(...getKingAttacks(boardState, cordinate, color));
+    if (blocking) {
+        attackedSquare.push(...getPawnAttacks(boardState, cordinate, color));
+    } else {
+        attackedSquare.push(...getPawnBlocks(boardState, cordinate, color));
+    }
 
     return attackedSquare;
 };
@@ -226,6 +218,30 @@ export const getKingAttacks = (
         [-1, 0],
         [0, -1],
     ];
+
+    return getMovesAttacks(boardState, cordinate, targetPiece, moves);
+};
+
+export const getPawnBlocks = (
+    boardState: BoardState,
+    cordinate: Square,
+    color: Color
+): Square[] => {
+    const targetPiece = color === WHITE ? B_P : W_P;
+
+    let moves: number[][] = [];
+
+    if (color === WHITE) {
+        moves = [
+            [0, 1],
+            [0, 1],
+        ];
+    } else {
+        moves = [
+            [0, -1],
+            [0, -1],
+        ];
+    }
 
     return getMovesAttacks(boardState, cordinate, targetPiece, moves);
 };
@@ -278,9 +294,9 @@ export const getKnightAttacks = (
 export const getQueenAttacks = (
     boardState: BoardState,
     cordinate: Square,
-    color: Color
+    color: Color,
 ): Square[] => {
-    const targetColor = color === WHITE ? BLACK : WHITE;
+    const targetColor = (color ^ 1) as Color;
     const targetPiece = color === WHITE ? B_Q : W_Q;
 
     const dirs: Square[] = [
@@ -306,9 +322,9 @@ export const getQueenAttacks = (
 export const getBishopAttacks = (
     boardState: BoardState,
     cordinate: Square,
-    color: Color
+    color: Color,
 ): Square[] => {
-    const targetColor = color === WHITE ? BLACK : WHITE;
+    const targetColor = (color ^ 1) as Color;
     const targetPiece = color === WHITE ? B_B : W_B;
 
     const dirs: Square[] = [
@@ -330,9 +346,9 @@ export const getBishopAttacks = (
 export const getRookAttacks = (
     boardState: BoardState,
     cordinate: Square,
-    color: Color
+    color: Color,
 ): Square[] => {
-    const targetColor = color === WHITE ? BLACK : WHITE;
+    const targetColor = (color ^ 1) as Color;
     const targetPiece = color === WHITE ? B_R : W_R;
 
     const dirs: Square[] = [
@@ -380,7 +396,7 @@ export const getLineAttack = (
     cordinate: Square,
     targetColor: Color,
     targetPiece: Piece,
-    dir: Square
+    dir: Square,
 ): Square | null => {
     let currSquare = { ...cordinate };
     currSquare.file += dir.file;

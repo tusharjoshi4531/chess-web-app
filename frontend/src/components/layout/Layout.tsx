@@ -77,6 +77,7 @@ const Layout = ({ children }: LayoutProps) => {
                         onClickLogin={loginClickHandler}
                         onClickSignup={signupClickHandler}
                         onClickLogout={logoutClickHandler}
+                        title="NO CASTLING CHESS"
                     />
                 </header>
                 <aside>

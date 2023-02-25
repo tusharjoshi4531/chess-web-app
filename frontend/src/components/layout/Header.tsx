@@ -6,14 +6,20 @@ type HeaderPops = {
     onClickLogin: React.MouseEventHandler<HTMLButtonElement>;
     onClickSignup: React.MouseEventHandler<HTMLButtonElement>;
     onClickLogout: React.MouseEventHandler<HTMLButtonElement>;
+    title: string;
 };
 
-const Header = ({ onClickLogin, onClickSignup, onClickLogout }: HeaderPops) => {
+const Header = ({
+    onClickLogin,
+    onClickSignup,
+    onClickLogout,
+    title,
+}: HeaderPops) => {
     const { username } = useContext(UserContext);
 
     return (
         <div className={styles.container}>
-            <h3>Chess App</h3>
+            <h3>{title}</h3>
             <div className={styles.actions}>
                 {username === "" ? (
                     <>

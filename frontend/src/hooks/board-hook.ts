@@ -32,11 +32,9 @@ import {
     checkRook,
 } from "../helper/check-piece";
 import {
-    getAttackingSquare,
     getKingSquare,
     getSquareStatus,
-    isSquareAttacked,
-    isSquareInCheckmate,
+    isSquareInCheck,
 } from "../helper/check-square-attacked";
 import { updateBoard } from "../helper/update-board";
 
@@ -217,22 +215,85 @@ export const useBoard: UseBoard = () => {
         rank: number,
         onMoveFinish: (changes: BoardChange[]) => void = () => {}
     ) => {
-        if (file === chosenSquare?.file && rank === chosenSquare.rank) {
+        if (!isOnCurrentMove() || checkmateSquare !== null) {
             return;
         }
 
         if (chosenSquare === null) {
-            if (
+            const chosenSquareIsValidWithoutCheck =
                 (turn === WHITE &&
                     getColor(boardState[rank][file]) === WHITE) ||
-                (turn === BLACK && getColor(boardState[rank][file]) === BLACK)
-            ) {
+                (turn === BLACK && getColor(boardState[rank][file]) === BLACK);
+
+            const chosenSquareIsValid = chosenSquareIsValidWithoutCheck;
+
+            if (chosenSquareIsValid) {
                 setChosenSquare({ file, rank });
             }
-        } else {
+        } else if (
+            (file !== chosenSquare.file || rank !== chosenSquare.rank) &&
+            isValidMove(file, rank)
+        ) {
             movePiece(file, rank, onMoveFinish);
+        } else {
+            setChosenSquare(null);
         }
     };
+
+    const isValidMove = (file: number, rank: number): boolean => {
+        if (chosenSquare === null) return false;
+
+        const tempBoard = boardState.map((row) => row.slice());
+
+        updateBoard({ file, rank }, chosenSquare, tempBoard);
+
+        const kingSquare = getKingSquare(tempBoard, turn);
+        if (kingSquare === null) return false;
+
+        return !isSquareInCheck(tempBoard, kingSquare, turn);
+    };
+
+    // const chosenSquareValidityForChecks = (
+    //     file: number,
+    //     rank: number
+    // ): boolean => {
+    //     if (checkSquare === null) {
+    //         return true;
+    //     }
+
+    //     const checkingSquares = getAttackingSquare(
+    //         boardState,
+    //         checkSquare,
+    //         turn
+    //     );
+    //     console.log(checkingSquares);
+
+    //     if (checkingSquares.length > 1) {
+    //         return rank === checkSquare.rank && file === checkSquare.file;
+    //     }
+
+    //     const checkingSquare = checkingSquares[0];
+
+    //     const validSquares = [
+    //         ...getInterceptingPieceSquares(
+    //             boardState,
+    //             checkSquare,
+    //             checkingSquare,
+    //             turn
+    //         ),
+    //         checkSquare,
+    //     ];
+
+    //     let isValid = false;
+
+    //     validSquares.forEach((square) => {
+    //         if (square.file === file && square.rank === rank) {
+    //             isValid = true;
+    //         }
+    //     });
+
+    //     return isValid;
+    // };
 
     const setNewMoves = (
         newMoves: Move[],

@@ -20,7 +20,7 @@ const GamePage = () => {
         gameMoves,
     } = useContext(GameContext);
 
-    const { isOnCurrentMove, onChoseSquare, addMove, turn } = gameMethods;
+    const { onChoseSquare, addMove, turn } = gameMethods;
 
     const challengeColor = challengeData!.black === username ? BLACK : WHITE;
 
@@ -70,7 +70,7 @@ const GamePage = () => {
     };
 
     const cellClickHandler = (file: number, rank: number) => {
-        if (!isOnCurrentMove() || turn !== challengeColor) return;
+        if (turn !== challengeColor) return;
 
         console.log(file, rank);
 

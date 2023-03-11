@@ -1,0 +1,25 @@
+
+
+.navbar {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    background-color: rgb(36, 36, 36);
+}
+
+.navbar button {
+    height: 30px;
+    margin: 0px 8px;
+    border-radius: 16px;
+    padding: 4px 16px;
+    border: none;
+    background-color: gray;
+    color: white;
+    font-weight: bold;
+}
+
+.navbar button:hover {
+    background-color: rgb(207, 207, 207);
+    color: black;
+}

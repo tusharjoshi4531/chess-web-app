@@ -1,9 +1,7 @@
-const Mainpage = () => {
-    return (
-        <div>
-            main            
-        </div>
-    )
-}
+import MainPageForm from "../components/form/MainPageForm";
 
-export default Mainpage
+const Mainpage = () => {
+    return <MainPageForm />;
+};
+
+export default Mainpage;

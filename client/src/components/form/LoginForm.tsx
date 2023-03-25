@@ -1,4 +1,7 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import login from "../../api/auth/login";
+import { USER_ACTION_TYPE } from "../../store/user/types";
+import UserContext from "../../store/user/user-context";
 import FormLayout from "./FormLayout";
 
 const LoginForm = () => {
@@ -6,8 +9,11 @@ const LoginForm = () => {
     const emailInputRef = useRef<HTMLInputElement>(null!);
     const passwordIputRef = useRef<HTMLInputElement>(null!);
 
+    // hooks
+    const { userId, dispatch } = useContext(UserContext);
+
     // Submit handler
-    const formSubmitHandler = () => {
+    const formSubmitHandler = async () => {
         const email = emailInputRef.current.value;
         const password = passwordIputRef.current.value;
 
@@ -17,11 +23,24 @@ const LoginForm = () => {
         }
 
         // Check if password is longer than 5 characters
-        if (password.trim().length < 5){
+        if (password.trim().length < 5) {
             return;
         }
 
         console.log(email, password);
+
+        try {
+            const userData = await login(email, password);
+
+            dispatch({
+                type: USER_ACTION_TYPE.UPDATE_USER,
+                payload: userData,
+            });
+
+            console.log(userId);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (

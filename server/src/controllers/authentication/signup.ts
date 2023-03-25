@@ -37,7 +37,7 @@ export const signup: RequestHandler = async (
             {
                 email: result.email,
                 username: result.username,
-                id: result._id,
+                userId: result._id,
             },
             process.env.SECRET_KEY!
         );

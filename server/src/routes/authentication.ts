@@ -4,7 +4,7 @@ import signup from "../controllers/authentication/signup";
 
 const authenticationRouter = Router()
 
-authenticationRouter.get("/", login)
-authenticationRouter.post("/", signup)
+authenticationRouter.post("/login", login)
+authenticationRouter.post("/signup", signup)
 
 export default authenticationRouter

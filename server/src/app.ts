@@ -1,8 +1,16 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import authenticationRouter from "./routes/authentication";
 
 const app = express();
+
+app.use(
+    cors({
+        origin: "*",
+        methods: ["GET", "POST"],
+    })
+);
 
 app.use(express.json());
 

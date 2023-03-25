@@ -4,6 +4,14 @@ form {
     padding: 32px;
 }
 
+button {
+    height: 30px;
+    margin: 0px 8px;
+    padding: 4px 16px;
+    border: none;
+    font-weight: bold;
+}
+
 .title {
     font-size: 24px;
     font-weight: bold;
@@ -42,17 +50,12 @@ form {
 }
 
 .actions button {
-    height: 30px;
-    margin: 0px 8px;
     border-radius: 16px;
-    padding: 4px 16px;
-    border: none;
     background-color: rgb(78, 78, 78);
     color: white;
-    font-weight: bold;
     width: 80px;
 }
 
-.actions button:hover{
+.actions button:hover {
     background-color: rgb(36, 36, 36);
 }

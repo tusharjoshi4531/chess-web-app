@@ -44,7 +44,7 @@ export const login: RequestHandler = async (
             email,
             username: existingUser.username,
             token,
-            id: existingUser._id,
+            userId: existingUser._id,
         });
     } catch (error) {
         console.log(error);

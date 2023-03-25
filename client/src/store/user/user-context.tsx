@@ -1,24 +1,12 @@
 import { createContext } from "react";
-
-export interface IUserData {
-    token: string;
-    username: string;
-    userId: string;
-}
+import { IReducerAction, IUserData } from "./types";
 
 export const initialState: IUserData = {
     token: "",
     userId: "",
     username: "",
+    email: "",
 };
-
-export const enum USER_ACTION_TYPE {
-    UPDATE_USER,
-}
-
-export interface IReducerAction {
-    type: USER_ACTION_TYPE;
-}
 
 interface IUserContext extends IUserData {
     dispatch: React.Dispatch<IReducerAction>;

@@ -1,9 +1,17 @@
+import { useNavigate } from "react-router";
 import styles from "./Aside.module.css";
 
 const Aside = () => {
+
+    const navigate = useNavigate();
+
+    const homeClickHandler = () => {
+        navigate("");
+    }
+
     return (
         <div className={styles.Aside}>
-            <button>home</button>
+            <button onClick={homeClickHandler}>home</button>
         </div>
     );
 };

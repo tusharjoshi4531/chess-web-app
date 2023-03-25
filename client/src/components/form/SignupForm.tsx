@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import signup from "../../api/auth/signup";
 import FormLayout from "./FormLayout";
 
 const SignupForm = () => {
@@ -8,7 +9,7 @@ const SignupForm = () => {
     const passwordIputRef = useRef<HTMLInputElement>(null!);
 
     // Submit handler
-    const formSubmitHandler = () => {
+    const formSubmitHandler = async () => {
         const username = usernameInputRef.current.value;
         const email = emailInputRef.current.value;
         const password = passwordIputRef.current.value;
@@ -29,6 +30,14 @@ const SignupForm = () => {
         }
 
         console.log(email, password, username);
+
+        try {
+            const userData = await signup(username, email, password);
+
+            console.log(userData);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (

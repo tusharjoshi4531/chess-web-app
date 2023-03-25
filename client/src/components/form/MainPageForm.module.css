@@ -1,0 +1,22 @@
+.colorSelectorContainer {
+    display: flex;
+    margin-top: 8px;
+    gap: 16px;
+}
+.colorSelectorContainer button {
+    border-radius: 4px;
+    color: white;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.colorSelectorContainer button:hover {
+    background-color: rgb(78, 78, 78);
+}
+.colorSelectorButton {
+    background-color: rgb(36, 36, 36);
+}
+
+.selectdColorSelectorButton {
+    background-color: rgb(78, 78, 78);
+}

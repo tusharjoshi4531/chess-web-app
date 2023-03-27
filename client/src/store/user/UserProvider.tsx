@@ -5,6 +5,8 @@ import {
     getUserDataFromLocalStorage,
     saveUserDataToLocalStorage,
 } from "../../helper/local-storage";
+import { useSocket } from "../../hooks/use-socket";
+import { SERVER_URL } from "../../api/Util";
 
 interface UserProviderProps {
     children: React.ReactNode;
@@ -19,7 +21,7 @@ const reducer = (state: IUserData, action: IReducerAction): IUserData => {
 
         case USER_ACTION_TYPE.CLEAR_USER:
             return { email: "", token: "", userId: "", username: "" };
-            
+
         default:
             return state;
     }
@@ -28,15 +30,33 @@ const reducer = (state: IUserData, action: IReducerAction): IUserData => {
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
 
+    const socket = useSocket(SERVER_URL, {
+        autoConnect: false,
+    });
+
     useEffect(() => {
-        dispatch({
-            type: USER_ACTION_TYPE.UPDATE_USER,
-            payload: getUserDataFromLocalStorage(),
-        });
+        const savedUserData = getUserDataFromLocalStorage();
+
+        if (savedUserData.userId == "") return;
+
+        socket.connect(
+            {
+                userId: savedUserData.userId,
+                username: savedUserData.username,
+                email: savedUserData.email,
+            },
+            (status) => {
+                if (status)
+                    dispatch({
+                        type: USER_ACTION_TYPE.UPDATE_USER,
+                        payload: savedUserData,
+                    });
+            }
+        );
     }, []);
 
     return (
-        <UserContext.Provider value={{ ...state, dispatch }}>
+        <UserContext.Provider value={{ ...state, dispatch, socket }}>
             {children}
         </UserContext.Provider>
     );

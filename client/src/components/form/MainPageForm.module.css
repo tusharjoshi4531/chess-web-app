@@ -11,12 +11,12 @@
 }
 
 .colorSelectorContainer button:hover {
-    background-color: rgb(78, 78, 78);
+    background-color: rgb(36, 36, 36);
 }
 .colorSelectorButton {
-    background-color: rgb(36, 36, 36);
+    background-color: rgb(95, 95, 95);
 }
 
 .selectdColorSelectorButton {
-    background-color: rgb(78, 78, 78);
+    background-color: rgb(36, 36, 36);
 }

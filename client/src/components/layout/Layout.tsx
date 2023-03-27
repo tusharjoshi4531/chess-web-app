@@ -13,7 +13,9 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
                 <Navbar />
             </nav>
             <div className={styles.body}>
-                <aside><Aside /></aside>
+                <aside>
+                    <Aside />
+                </aside>
                 <main>{children}</main>
             </div>
         </div>

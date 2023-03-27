@@ -8,7 +8,7 @@ import styles from "./Navbar.module.css";
 const Navbar = () => {
     //hooks
     const navigate = useNavigate();
-    const { userId, dispatch } = useContext(UserContext);
+    const { userId, dispatch, socket } = useContext(UserContext);
 
     const loginClickHandler = () => {
         navigate("/login");
@@ -19,6 +19,7 @@ const Navbar = () => {
     };
 
     const logoutClickHandler = () => {
+        socket.disconnect();
         dispatch({ type: USER_ACTION_TYPE.CLEAR_USER });
         removeUserDataFromLocalStorage();
     };

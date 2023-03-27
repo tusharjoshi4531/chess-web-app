@@ -1,4 +1,6 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { IChallengeData } from "../../store/game/types";
+import UserContext from "../../store/user/user-context";
 import FormLayout from "./FormLayout";
 
 import styles from "./MainPageForm.module.css";
@@ -9,6 +11,8 @@ const MainPageForm = () => {
     const emailInputRef = useRef<HTMLInputElement>(null!);
 
     // hooks
+    const { username, email, socket } = useContext(UserContext);
+
     const [chosenWhite, setChosenWhite] = useState<boolean>(true);
 
     const usernameInputBlurHandler = () =>
@@ -17,11 +21,31 @@ const MainPageForm = () => {
     const emailInputBlurHandler = () =>
         (usernameInputRef.current.disabled = !!emailInputRef.current.value);
 
-    const selectedButtonClasses = `${styles.colorSelectorButton} ${styles.selectdColorSelectorButton}`;
-    const unselectedButtonClasses = `${styles.colorSelectorButton}`;
+    const whiteButtonClasses = `${styles.colorSelectorButton} ${
+        chosenWhite && styles.selectdColorSelectorButton
+    }`;
+
+    const blackButtonClasses = `${styles.colorSelectorButton} ${
+        !chosenWhite && styles.selectdColorSelectorButton
+    }`;
+
+    const submitFormHandler = () => {
+        const to = emailInputRef.current.value + usernameInputRef.current.value;
+        if (to == username || to == email) return;
+
+        const data: IChallengeData = {
+            black: !chosenWhite ? username : to,
+            white: chosenWhite ? username : to,
+            from: username,
+            to,
+        };
+
+        socket.sendChallenge(data, (status: boolean) => console.log(status));
+    };
 
     return (
         <FormLayout
+            onSubmit={submitFormHandler}
             title="Challenge"
             control={
                 <>
@@ -42,22 +66,16 @@ const MainPageForm = () => {
                     <label>Color</label>
                     <div className={styles.colorSelectorContainer}>
                         <button
-                            className={
-                                chosenWhite
-                                    ? selectedButtonClasses
-                                    : unselectedButtonClasses
-                            }
+                            className={whiteButtonClasses}
                             onClick={() => setChosenWhite(true)}
+                            type="button"
                         >
                             White
                         </button>
                         <button
-                            className={
-                                !chosenWhite
-                                    ? selectedButtonClasses
-                                    : unselectedButtonClasses
-                            }
+                            className={blackButtonClasses}
                             onClick={() => setChosenWhite(false)}
+                            type="button"
                         >
                             Black
                         </button>

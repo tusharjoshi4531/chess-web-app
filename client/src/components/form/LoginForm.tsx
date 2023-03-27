@@ -1,4 +1,5 @@
 import { useContext, useRef } from "react";
+import { useNavigate } from "react-router";
 import login from "../../api/auth/login";
 import { USER_ACTION_TYPE } from "../../store/user/types";
 import UserContext from "../../store/user/user-context";
@@ -10,7 +11,8 @@ const LoginForm = () => {
     const passwordIputRef = useRef<HTMLInputElement>(null!);
 
     // hooks
-    const { userId, dispatch } = useContext(UserContext);
+    const { userId, dispatch, socket } = useContext(UserContext);
+    const navigate = useNavigate();
 
     // Submit handler
     const formSubmitHandler = async () => {
@@ -32,12 +34,23 @@ const LoginForm = () => {
         try {
             const userData = await login(email, password);
 
-            dispatch({
-                type: USER_ACTION_TYPE.UPDATE_USER,
-                payload: userData,
-            });
+            if (!userData) return;
 
-            console.log(userId);
+            socket.connect(
+                {
+                    userId: userData.userId,
+                    username: userData.username,
+                    email: userData.email,
+                },
+                (status) => {
+                    if (!status) return;
+                    dispatch({
+                        type: USER_ACTION_TYPE.UPDATE_USER,
+                        payload: userData,
+                    });
+                    navigate("/");
+                }
+            );
         } catch (error) {
             console.log(error);
         }

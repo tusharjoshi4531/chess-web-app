@@ -1,5 +1,8 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { useNavigate } from "react-router";
 import signup from "../../api/auth/signup";
+import { USER_ACTION_TYPE } from "../../store/user/types";
+import UserContext from "../../store/user/user-context";
 import FormLayout from "./FormLayout";
 
 const SignupForm = () => {
@@ -7,6 +10,10 @@ const SignupForm = () => {
     const usernameInputRef = useRef<HTMLInputElement>(null!);
     const emailInputRef = useRef<HTMLInputElement>(null!);
     const passwordIputRef = useRef<HTMLInputElement>(null!);
+
+    // Hooks
+    const { dispatch, socket } = useContext(UserContext);
+    const navigate = useNavigate();
 
     // Submit handler
     const formSubmitHandler = async () => {
@@ -34,7 +41,22 @@ const SignupForm = () => {
         try {
             const userData = await signup(username, email, password);
 
-            console.log(userData);
+            if (!userData) return;
+            socket.connect(
+                {
+                    userId: userData.userId,
+                    username: userData.username,
+                    email: userData.email,
+                },
+                (status) => {
+                    if (!status) return;
+                    dispatch({
+                        type: USER_ACTION_TYPE.UPDATE_USER,
+                        payload: userData,
+                    });
+                    navigate("/");
+                }
+            );
         } catch (error) {
             console.log(error);
         }

@@ -4,11 +4,17 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 
 import "./index.css";
+import GameProvider from "./store/game/GameProvider";
+import UserProvider from "./store/user/UserProvider";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <React.StrictMode>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
-    </React.StrictMode>
+    // <React.StrictMode>
+    <UserProvider>
+        <GameProvider>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </GameProvider>
+    </UserProvider>
+    // </React.StrictMode>
 );

@@ -18,12 +18,13 @@ export interface IGameState {
 
 export enum GAME_STATE_ACTION_TYPE {
     SET_STATE,
+    CLEAR_STATE,
     UPDATE_BOARD,
 }
 
 export interface IGameStateReducerAction {
     type: GAME_STATE_ACTION_TYPE;
-    payload: IGameState | string;
+    payload?: IGameState | string;
 }
 
 export const initialGameState: IGameState = {
@@ -35,3 +36,14 @@ export const initialGameState: IGameState = {
 
 export const startGameState =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+export interface IGameFinish {
+    roomId: string;
+    winner: 0 | 1 | 2;
+    type:
+        | "resign"
+        | "threefolds"
+        | "insuffecient material"
+        | "checkmate"
+        | "stalemate";
+}

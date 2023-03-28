@@ -7,12 +7,13 @@ import app from "./app";
 import {
     createChallenge,
     findGameStateWithUsername,
+    finishGame,
     getGameState,
     moveMade,
     sendChallenge,
 } from "./websokets/challenge";
 import { connect, debug, disconnect } from "./websokets/connection";
-import { IChallengeData, IGameData, IMoveMade } from "./websokets/types";
+import { IChallengeData, IGameData, IGameFinish, IMoveMade } from "./websokets/types";
 
 const PORT = process.env.PORT || 3000;
 
@@ -60,7 +61,7 @@ io.on("connection", (socket) => {
         createChallenge(data, io);
     });
 
-    // Check if user is in a roo,
+    // Check if user is in a room,
     socket.on("check-user-in-game", (data, callback) => {
         callback(findGameStateWithUsername(data.username));
     });
@@ -71,6 +72,12 @@ io.on("connection", (socket) => {
         const hasMadeMove = moveMade(data, io);
         if (callback) callback(hasMadeMove);
     });
+
+    // When game finishes
+    socket.on("game-finish", (data: IGameFinish) => {
+        console.log(data);
+        finishGame(data, io);
+    })
 
     // Disconnect user
     socket.on("disconnect", () => {

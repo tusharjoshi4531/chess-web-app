@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
-import { IChallengeData, IGameState } from "../store/game/types";
+import { IChallengeData, IGameFinish, IGameState } from "../store/game/types";
 import {
     IUseSocketValue,
     SocketSendChallenge,
@@ -12,6 +12,8 @@ import {
     SocketSubscribeChallengeCreated,
     SocketSubscribeMoveMade,
     SocketUnsubscribeMoveMade,
+    SocketSubscribeGameFinish,
+    SocketUnsubscribeGameFinish,
 } from "./Types";
 
 export const useSocket = (
@@ -69,6 +71,16 @@ export const useSocket = (
         socketRef.current.removeListener("move-made");
     };
 
+    const subscribeGameFinish: SocketSubscribeGameFinish = (callback) => {
+        socketRef.current.on("game-finish", (data: IGameFinish) => {
+            callback(data);
+        });
+    };
+
+    const unsubscribeGameFinish: SocketUnsubscribeGameFinish = () => {
+        socketRef.current.removeListener("game-finish");
+    };
+
     useEffect(
         () => () => {
             if (socketRef.current) disconnect();
@@ -87,5 +99,7 @@ export const useSocket = (
         unsubscribeChallengeCreated,
         subscribeMoveMade,
         unsubscribeMoveMade,
+        subscribeGameFinish,
+        unsubscribeGameFinish,
     };
 };

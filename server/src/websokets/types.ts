@@ -20,3 +20,14 @@ export interface IMoveMade {
     roomId: string;
     boardState: string;
 }
+
+export interface IGameFinish {
+    roomId: string;
+    winner: 0 | 1 | 2;
+    type:
+        | "resign"
+        | "threefolds"
+        | "insuffecient material"
+        | "checkmate"
+        | "stalemate";
+}

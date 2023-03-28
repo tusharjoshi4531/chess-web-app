@@ -12,6 +12,7 @@ import GameContext from "./game-context";
 import {
     GAME_STATE_ACTION_TYPE,
     IChallengeData,
+    IGameFinish,
     IGameState,
     IGameStateReducerAction,
     initialGameState,
@@ -29,6 +30,12 @@ const reducer = (state: IGameState, action: IGameStateReducerAction) => {
 
         case GAME_STATE_ACTION_TYPE.UPDATE_BOARD:
             return { ...state, boardState: action.payload as string };
+
+        case GAME_STATE_ACTION_TYPE.CLEAR_STATE:
+            return { ...initialGameState };
+
+        default:
+            return state;
     }
 };
 
@@ -64,10 +71,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         );
     };
 
-    const challengeCreatedHandler = (data: IGameState) => {
-        dispatch({ type: GAME_STATE_ACTION_TYPE.SET_STATE, payload: data });
-    };
-
     const moveMadeHandler = (data: { boardState: string }) => {
         dispatch({
             type: GAME_STATE_ACTION_TYPE.UPDATE_BOARD,
@@ -77,13 +80,32 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         gameRef.current.load(data.boardState);
     };
 
+    const gameFinishHandler = (data: IGameFinish) => {
+        console.log(data);
+        dispatch({type: GAME_STATE_ACTION_TYPE.CLEAR_STATE});
+
+        socket.unsubscribeMoveMade();
+        socket.unsubscribeGameFinish();
+
+        socket.subscribeChallengeReceive(challengeReceiveHandler);
+        socket.subscribeChallengeCreated(challengeCreatedHandler);
+    };
+
+    const challengeCreatedHandler = (data: IGameState) => {
+        dispatch({ type: GAME_STATE_ACTION_TYPE.SET_STATE, payload: data });
+        socket.subscribeMoveMade(moveMadeHandler);
+        socket.subscribeGameFinish(gameFinishHandler);
+
+        socket.unsubscribeChallengeReceive();
+        socket.unsubscribeChallengeCreated();
+    };
+
     useEffect(() => {
         if (!socket.obj) return;
         if (userId != "") {
             console.log("t");
             socket.subscribeChallengeReceive(challengeReceiveHandler);
             socket.subscribeChallengeCreated(challengeCreatedHandler);
-            socket.subscribeMoveMade(moveMadeHandler);
 
             socket.obj.emit(
                 "check-user-in-game",

@@ -6,7 +6,12 @@
     padding-top: 32px;
 }
 
-.gameContainer button{
-    background-color: rgb(30, 30, 30);;
+.gameContainer button {
+    background-color: rgb(30, 30, 30);
     color: white;
+    border-radius: 4px;
+}
+
+.gameContainer button:hover {
+    background-color: rgb(100, 100, 100);
 }

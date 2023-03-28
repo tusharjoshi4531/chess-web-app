@@ -6,7 +6,13 @@ import {
     getUsernameFromEmail,
     rooms,
 } from "./global";
-import { IChallengeData, IGameData, IGameState, IMoveMade } from "./types";
+import {
+    IChallengeData,
+    IGameData,
+    IGameFinish,
+    IGameState,
+    IMoveMade,
+} from "./types";
 
 export const sendChallenge = (data: IChallengeData, io: Server): boolean => {
     if (data.to.includes("@")) data.to = getUsernameFromEmail(data.to);
@@ -98,4 +104,35 @@ export const findGameStateWithUsername = (
     const gameState = getGameState(username, roomId, roomData);
 
     return gameState;
+};
+
+export const finishGame = (data: IGameFinish, io: Server) => {
+    if (!rooms.has(data.roomId)) return;
+
+    const { white, black } = rooms.get(data.roomId)!;
+
+    const winner = data.winner === 0 ? white : black;
+    const loser = data.winner === 0 ? black : white;
+
+    let message = "";
+
+    if (data.type === "resign") message = `${loser} resigned`;
+    else if (data.type === "threefolds")
+        message = "Draw by threefold repetition";
+    else if (data.type === "stalemate") message = "Draw by stalemate";
+    else if (data.type === "insuffecient material")
+        message = "Draw by insufficient material";
+    else if (data.type === "checkmate")
+        message = `${winner} checkmated ${loser}`;
+    else message = "unexpected message";
+
+    const winnerSocketId = getSocketIdFromUsername(winner);
+    const loserSocketId = getSocketIdFromUsername(loser);
+
+    console.log({ winner, loser, winnerSocketId, loserSocketId });
+
+    io.to([winnerSocketId, loserSocketId]).emit("game-finish", {
+        winner: data.winner,
+        message,
+    });
 };

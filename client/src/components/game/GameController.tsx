@@ -9,7 +9,7 @@ import styles from "./GameController.module.css";
 
 const GameController = () => {
     const { game, gameData, dispatch } = useContext(GameContext);
-    const { socket } = useContext(UserContext);
+    const { socket, username } = useContext(UserContext);
 
     const moveMadeHandler = (newBoardState: string) => {
         if (!socket.obj || !gameData) return;
@@ -27,6 +27,15 @@ const GameController = () => {
         });
     };
 
+    const resignClickHandler = () => {
+        console.log(gameData.color ^ 1);
+        socket.obj.emit("game-finish", {
+            winner: gameData.color ^ 1,
+            type: "resign",
+            roomId: gameData.roomId,
+        });
+    };
+
     return (
         <div className={styles.gameContainer}>
             <GameBoard
@@ -36,9 +45,9 @@ const GameController = () => {
                 color={gameData.color}
                 pos={gameData.boardState}
             />
-            <button>Resign</button>
+            <button onClick={resignClickHandler}>Resign</button>
         </div>
     );
-}
+};
 
-export default GameController
+export default GameController;

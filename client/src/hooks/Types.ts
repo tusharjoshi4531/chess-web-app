@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { IChallengeData, IGameState } from "../store/game/types";
+import { IChallengeData, IGameState, IGameFinish } from "../store/game/types";
 
 export type SocketConnect = (
     data: {
@@ -33,7 +33,13 @@ export type SocketSubscribeMoveMade = (
     callback: (data: { boardState: string }) => void
 ) => void;
 
-export type SocketUnsubscribeMoveMade = () => void
+export type SocketUnsubscribeMoveMade = () => void;
+
+export type SocketSubscribeGameFinish = (
+    callback: (data: IGameFinish) => void
+) => void;
+
+export type SocketUnsubscribeGameFinish = () => void;
 
 export interface IUseSocketValue {
     obj: Socket;
@@ -46,4 +52,6 @@ export interface IUseSocketValue {
     unsubscribeChallengeCreated: SocketUnsubscribeChallengeCreated;
     subscribeMoveMade: SocketSubscribeMoveMade;
     unsubscribeMoveMade: SocketUnsubscribeMoveMade;
+    subscribeGameFinish: SocketSubscribeGameFinish;
+    unsubscribeGameFinish: SocketUnsubscribeGameFinish;
 }

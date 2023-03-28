@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { io, ManagerOptions, SocketOptions } from "socket.io-client";
-import { IChallengeData, IGameFinish, IGameState } from "../store/game/types";
+import { IChallengeData, IGameFinish, IGameResult, IGameState } from "../store/game/types";
 import {
     IUseSocketValue,
     SocketSendChallenge,
@@ -72,7 +72,7 @@ export const useSocket = (
     };
 
     const subscribeGameFinish: SocketSubscribeGameFinish = (callback) => {
-        socketRef.current.on("game-finish", (data: IGameFinish) => {
+        socketRef.current.on("game-finish", (data: IGameResult) => {
             callback(data);
         });
     };

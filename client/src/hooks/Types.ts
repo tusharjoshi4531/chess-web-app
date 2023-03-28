@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { IChallengeData, IGameState, IGameFinish } from "../store/game/types";
+import { IChallengeData, IGameState, IGameFinish, IGameResult } from "../store/game/types";
 
 export type SocketConnect = (
     data: {
@@ -36,7 +36,7 @@ export type SocketSubscribeMoveMade = (
 export type SocketUnsubscribeMoveMade = () => void;
 
 export type SocketSubscribeGameFinish = (
-    callback: (data: IGameFinish) => void
+    callback: (data: IGameResult) => void
 ) => void;
 
 export type SocketUnsubscribeGameFinish = () => void;

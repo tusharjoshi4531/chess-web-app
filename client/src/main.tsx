@@ -9,12 +9,12 @@ import UserProvider from "./store/user/UserProvider";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     // <React.StrictMode>
-    <UserProvider>
-        <GameProvider>
-            <BrowserRouter>
+    <BrowserRouter>
+        <UserProvider>
+            <GameProvider>
                 <App />
-            </BrowserRouter>
-        </GameProvider>
-    </UserProvider>
+            </GameProvider>
+        </UserProvider>
+    </BrowserRouter>
     // </React.StrictMode>
 );

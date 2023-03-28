@@ -6,13 +6,14 @@ import React, {
     useRef,
     useState,
 } from "react";
+import { useNavigate } from "react-router";
 import Modal from "../../components/modal/Modal";
 import UserContext from "../user/user-context";
 import GameContext from "./game-context";
 import {
     GAME_STATE_ACTION_TYPE,
     IChallengeData,
-    IGameFinish,
+    IGameResult,
     IGameState,
     IGameStateReducerAction,
     initialGameState,
@@ -43,12 +44,14 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const gameRef = useRef(new Chess());
     const [gameData, dispatch] = useReducer(reducer, { ...initialGameState });
 
+    const navigate = useNavigate();
+
     const [modalComponent, setModalComponent] =
         useState<React.ReactNode | undefined>(undefined);
 
     const { socket, userId, username } = useContext(UserContext);
 
-    const modalConfirmHandler = (data: IChallengeData) => {
+    const challengeReceiveModalConfirmHandler = (data: IChallengeData) => {
         setModalComponent(undefined);
 
         socket.obj.emit("challenge-accepted", {
@@ -65,8 +68,9 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             <Modal
                 title="You Have Received a Challenge!!!"
                 content={`${from} has challenged you`}
-                onSubmit={() => modalConfirmHandler(data)}
+                onSubmit={() => challengeReceiveModalConfirmHandler(data)}
                 onCancel={() => setModalComponent(undefined)}
+                cancel={true}
             />
         );
     };
@@ -80,24 +84,47 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         gameRef.current.load(data.boardState);
     };
 
-    const gameFinishHandler = (data: IGameFinish) => {
-        console.log(data);
-        dispatch({type: GAME_STATE_ACTION_TYPE.CLEAR_STATE});
+    const gameFinishModalConfirmHandler = (data: IGameResult) => {
+        dispatch({ type: GAME_STATE_ACTION_TYPE.CLEAR_STATE });
+        setModalComponent(undefined);
 
         socket.unsubscribeMoveMade();
         socket.unsubscribeGameFinish();
 
         socket.subscribeChallengeReceive(challengeReceiveHandler);
-        socket.subscribeChallengeCreated(challengeCreatedHandler);
+        socket.subscribeChallengeCreated((data) => setChallenge(data));
     };
 
-    const challengeCreatedHandler = (data: IGameState) => {
+    const gameFinishHandler = (data: IGameResult) => {
+        console.log(data);
+        console.log(gameData);
+
+        let title: string;
+
+        if (data.winner === 2) title = "Its a Draw!!!";
+        else if (data.winner === 0) title = "White Wins!!!";
+        else title = "Black Wins!!!";
+
+        setModalComponent(
+            <Modal
+                title={title}
+                content={data.message}
+                cancel={false}
+                onSubmit={() => gameFinishModalConfirmHandler(data)}
+            />
+        );
+    };
+
+    const setChallenge = (data: IGameState) => {
         dispatch({ type: GAME_STATE_ACTION_TYPE.SET_STATE, payload: data });
+        gameRef.current.load(data.boardState);
         socket.subscribeMoveMade(moveMadeHandler);
         socket.subscribeGameFinish(gameFinishHandler);
 
         socket.unsubscribeChallengeReceive();
         socket.unsubscribeChallengeCreated();
+
+        navigate("/game");
     };
 
     useEffect(() => {
@@ -105,7 +132,7 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         if (userId != "") {
             console.log("t");
             socket.subscribeChallengeReceive(challengeReceiveHandler);
-            socket.subscribeChallengeCreated(challengeCreatedHandler);
+            socket.subscribeChallengeCreated((data) => setChallenge(data));
 
             socket.obj.emit(
                 "check-user-in-game",
@@ -113,12 +140,7 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
                 (data: IGameState | undefined) => {
                     if (!data) return;
 
-                    dispatch({
-                        type: GAME_STATE_ACTION_TYPE.SET_STATE,
-                        payload: data,
-                    });
-
-                    gameRef.current.load(data.boardState);
+                    setChallenge(data);
                 }
             );
         } else {

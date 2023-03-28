@@ -8,6 +8,7 @@ interface IModalProps {
     title?: string;
     content: string;
     el?: keyof HTMLElementTagNameMap;
+    cancel: boolean;
     onSubmit?: () => void;
     onCancel?: () => void;
 }
@@ -16,6 +17,7 @@ const Modal: React.FC<IModalProps> = ({
     title,
     content,
     el = "div",
+    cancel,
     onSubmit,
     onCancel,
 }) => {
@@ -39,9 +41,11 @@ const Modal: React.FC<IModalProps> = ({
                 control={<label>{content}</label>}
                 actions={
                     <>
-                        <button type="button" onClick={formCancelHandler}>
-                            cancel
-                        </button>
+                        {cancel && (
+                            <button type="button" onClick={formCancelHandler}>
+                                cancel
+                            </button>
+                        )}
                         <button type="submit">accept</button>
                     </>
                 }

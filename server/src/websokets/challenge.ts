@@ -118,7 +118,7 @@ export const finishGame = (data: IGameFinish, io: Server) => {
 
     if (data.type === "resign") message = `${loser} resigned`;
     else if (data.type === "threefolds")
-        message = "Draw by threefold repetition";
+       message = "Draw by threefold repetition";
     else if (data.type === "stalemate") message = "Draw by stalemate";
     else if (data.type === "insuffecient material")
         message = "Draw by insufficient material";
@@ -130,6 +130,8 @@ export const finishGame = (data: IGameFinish, io: Server) => {
     const loserSocketId = getSocketIdFromUsername(loser);
 
     console.log({ winner, loser, winnerSocketId, loserSocketId });
+
+    rooms.delete(data.roomId);
 
     io.to([winnerSocketId, loserSocketId]).emit("game-finish", {
         winner: data.winner,

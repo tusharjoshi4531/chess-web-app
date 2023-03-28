@@ -37,13 +37,20 @@ export const initialGameState: IGameState = {
 export const startGameState =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+export type GameFinishStatus =
+    | "resign"
+    | "threefolds"
+    | "insuffecient material"
+    | "checkmate"
+    | "stalemate";
+
 export interface IGameFinish {
     roomId: string;
     winner: 0 | 1 | 2;
-    type:
-        | "resign"
-        | "threefolds"
-        | "insuffecient material"
-        | "checkmate"
-        | "stalemate";
+    type: GameFinishStatus;
+}
+
+export interface IGameResult {
+    winner: 0 | 1 | 2;
+    message: string;
 }

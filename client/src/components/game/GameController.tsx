@@ -1,15 +1,24 @@
-import { debug } from "console";
-import { useContext } from "react";
+import React, { useContext, useState } from "react";
 import GameBoard from "../game/GameBoard";
 import GameContext from "../../store/game/game-context";
-import { GAME_STATE_ACTION_TYPE } from "../../store/game/types";
+import {
+    GameFinishStatus,
+    GAME_STATE_ACTION_TYPE,
+} from "../../store/game/types";
 import UserContext from "../../store/user/user-context";
 
 import styles from "./GameController.module.css";
 
 const GameController = () => {
     const { game, gameData, dispatch } = useContext(GameContext);
-    const { socket, username } = useContext(UserContext);
+    const { socket } = useContext(UserContext);
+
+    const getGameFinishStatus = (): GameFinishStatus | undefined => {
+        if (game.isCheckmate()) return "checkmate";
+        if (game.isStalemate()) return "stalemate";
+        if (game.isInsufficientMaterial()) return "insuffecient material";
+        if (game.isThreefoldRepetition()) return "threefolds";
+    };
 
     const moveMadeHandler = (newBoardState: string) => {
         if (!socket.obj || !gameData) return;
@@ -25,10 +34,17 @@ const GameController = () => {
             roomId: gameData.roomId,
             boardState: newBoardState,
         });
+
+        const gameFinishStatus = getGameFinishStatus();
+        if (gameFinishStatus)
+            socket.obj.emit("game-finish", {
+                winner: gameFinishStatus === "checkmate" ? gameData.color : 2,
+                type: gameFinishStatus,
+                roomId: gameData.roomId,
+            });
     };
 
     const resignClickHandler = () => {
-        console.log(gameData.color ^ 1);
         socket.obj.emit("game-finish", {
             winner: gameData.color ^ 1,
             type: "resign",

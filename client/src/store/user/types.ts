@@ -1,3 +1,5 @@
+
+
 export interface IUserData {
     token: string;
     username: string;
@@ -14,3 +16,4 @@ export interface IReducerAction {
     type: USER_ACTION_TYPE;
     payload?: IUserData;
 }
+

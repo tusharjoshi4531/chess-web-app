@@ -1,7 +1,7 @@
-import GameBoard from "../components/game/GameBoard";
+import GameController from "../components/game/GameController";
 
 const Gamepage = () => {
-    return <GameBoard size={600} />;
+    return <GameController />;
 };
 
 export default Gamepage;

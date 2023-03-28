@@ -16,4 +16,22 @@ export interface IGameState {
     roomId: string;
 }
 
-export const startGameState = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+export enum GAME_STATE_ACTION_TYPE {
+    SET_STATE,
+    UPDATE_BOARD,
+}
+
+export interface IGameStateReducerAction {
+    type: GAME_STATE_ACTION_TYPE;
+    payload: IGameState | string;
+}
+
+export const initialGameState: IGameState = {
+    oponent: "",
+    boardState: "",
+    color: 1,
+    roomId: "",
+};
+
+export const startGameState =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";

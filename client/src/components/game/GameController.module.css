@@ -1,0 +1,12 @@
+.gameContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    padding-top: 32px;
+}
+
+.gameContainer button{
+    background-color: rgb(30, 30, 30);;
+    color: white;
+}

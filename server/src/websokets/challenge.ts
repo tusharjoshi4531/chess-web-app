@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
 import {
+    getRoomFromUsername,
     getSocketIdFromUsername,
     getUserIdFromUsername,
     getUsernameFromEmail,
     rooms,
 } from "./global";
-import { IChallengeData, IGameData, IGameState } from "./types";
+import { IChallengeData, IGameData, IGameState, IMoveMade } from "./types";
 
 export const sendChallenge = (data: IChallengeData, io: Server): boolean => {
     if (data.to.includes("@")) data.to = getUsernameFromEmail(data.to);
@@ -22,6 +23,30 @@ export const sendChallenge = (data: IChallengeData, io: Server): boolean => {
     return true;
 };
 
+export const getGameState = (
+    username: string,
+    roomId: string,
+    data: IGameData
+): IGameState | undefined => {
+    const userSocketId = getSocketIdFromUsername(username);
+
+    if (data.white == username)
+        return {
+            oponent: data.black,
+            color: 0,
+            boardState: data.boardState,
+            roomId,
+        };
+
+    if (data.black == username)
+        return {
+            oponent: data.white,
+            color: 1,
+            boardState: data.boardState,
+            roomId,
+        };
+};
+
 export const createChallenge = (data: IGameData, io: Server) => {
     const whiteUserId = getUserIdFromUsername(data.white);
     const blackUserId = getUserIdFromUsername(data.black);
@@ -33,20 +58,44 @@ export const createChallenge = (data: IGameData, io: Server) => {
     const whiteSocketId = getSocketIdFromUsername(data.white);
     const blackSocketId = getSocketIdFromUsername(data.black);
 
-    const whiteGameState: IGameState = {
-        oponent: data.black,
-        color: 0,
-        boardState: data.boardState,
-        roomId,
-    };
+    const whiteGameState = getGameState(data.white, roomId, data);
+    const blackGameState = getGameState(data.black, roomId, data);
 
-    const blackGameState: IGameState = {
-        oponent: data.white,
-        color: 1,
-        boardState: data.boardState,
-        roomId,
-    };
+    if (!whiteGameState || !blackGameState) return;
 
     io.to(whiteSocketId).emit("challenge-created", whiteGameState);
     io.to(blackSocketId).emit("challenge-created", blackGameState);
+};
+
+export const moveMade = (data: IMoveMade, io: Server): boolean => {
+    if (!rooms.has(data.roomId)) return false;
+
+    const gameData = rooms.get(data.roomId)!;
+    const { white, black } = gameData;
+
+    const whiteSocketId = getSocketIdFromUsername(white);
+    const blackSocketId = getSocketIdFromUsername(black);
+
+    if (whiteSocketId == "" || blackSocketId == "") return false;
+
+    rooms.set(data.roomId, { ...gameData, boardState: data.boardState });
+
+    io.to([whiteSocketId, blackSocketId]).emit("move-made", {
+        boardState: data.boardState,
+    });
+
+    return true;
+};
+
+export const findGameStateWithUsername = (
+    username: string
+): IGameState | undefined => {
+    const roomId = getRoomFromUsername(username);
+
+    if (roomId == "") return undefined;
+
+    const roomData = rooms.get(roomId)!;
+    const gameState = getGameState(username, roomId, roomData);
+
+    return gameState;
 };

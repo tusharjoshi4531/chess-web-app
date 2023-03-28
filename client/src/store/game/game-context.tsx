@@ -1,15 +1,18 @@
 import { Chess } from "chess.js";
 import { createContext } from "react";
-import { IGameState } from "./types";
+
+import { IGameState, IGameStateReducerAction, initialGameState } from "./types";
 
 interface IGameContext {
     game: Chess;
-    gameData?: IGameState;
+    gameData: IGameState;
+    dispatch: React.Dispatch<IGameStateReducerAction>;
 }
 
 const GameContext = createContext<IGameContext>({
     game: new Chess(),
-    gameData: undefined,
+    gameData: {...initialGameState},
+    dispatch: () => {},
 });
 
 export default GameContext;

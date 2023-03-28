@@ -30,3 +30,11 @@ export const getUserIdFromUsername = (username: string): string => {
     });
     return userId;
 };
+
+export const getRoomFromUsername = (username: string): string => {
+    let roomId = "";
+    rooms.forEach(({ white, black }, _roomId) => {
+        if (white == username || black == username) roomId = _roomId;
+    });
+    return roomId;
+};

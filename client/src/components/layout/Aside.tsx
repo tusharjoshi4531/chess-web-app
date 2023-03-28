@@ -17,7 +17,9 @@ const Aside = () => {
     return (
         <div className={styles.Aside}>
             <button onClick={homeClickHandler}>home</button>
-            {gameData && <button onClick={gameClickHandler}>game</button>}
+            {gameData.roomId !== "" && (
+                <button onClick={gameClickHandler}>game</button>
+            )}
         </div>
     );
 };

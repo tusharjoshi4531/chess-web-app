@@ -15,3 +15,8 @@ export interface IGameState {
     boardState: string;
     roomId: string;
 }
+
+export interface IMoveMade {
+    roomId: string;
+    boardState: string;
+}

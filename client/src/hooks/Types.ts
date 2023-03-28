@@ -29,6 +29,12 @@ export type SocketSubscribeChallengeCreated = (
 
 export type SocketUnsubscribeChallengeCreated = () => void;
 
+export type SocketSubscribeMoveMade = (
+    callback: (data: { boardState: string }) => void
+) => void;
+
+export type SocketUnsubscribeMoveMade = () => void
+
 export interface IUseSocketValue {
     obj: Socket;
     disconnect: SocketDisconnect;
@@ -38,4 +44,6 @@ export interface IUseSocketValue {
     unsubscribeChallengeReceive: SocketUnsubscribeChallengeReceive;
     subscribeChallengeCreated: SocketSubscribeChallengeCreated;
     unsubscribeChallengeCreated: SocketUnsubscribeChallengeCreated;
+    subscribeMoveMade: SocketSubscribeMoveMade;
+    unsubscribeMoveMade: SocketUnsubscribeMoveMade;
 }

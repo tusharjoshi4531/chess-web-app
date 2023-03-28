@@ -10,6 +10,8 @@ import {
     SocketUnsubscribeChallengeReceive,
     SocketUnsubscribeChallengeCreated,
     SocketSubscribeChallengeCreated,
+    SocketSubscribeMoveMade,
+    SocketUnsubscribeMoveMade,
 } from "./Types";
 
 export const useSocket = (
@@ -57,6 +59,16 @@ export const useSocket = (
             socketRef.current.removeListener("challenge-created");
         };
 
+    const subscribeMoveMade: SocketSubscribeMoveMade = (callback) => {
+        socketRef.current.on("move-made", (data: IGameState) => {
+            callback(data);
+        });
+    };
+
+    const unsubscribeMoveMade: SocketUnsubscribeMoveMade = () => {
+        socketRef.current.removeListener("move-made");
+    };
+
     useEffect(
         () => () => {
             if (socketRef.current) disconnect();
@@ -73,5 +85,7 @@ export const useSocket = (
         unsubscribeChallengeReceive,
         subscribeChallengeCreated,
         unsubscribeChallengeCreated,
+        subscribeMoveMade,
+        unsubscribeMoveMade,
     };
 };

@@ -9,6 +9,7 @@ export const connect = (
     if (getSocketIdFromUsername(username) != "") return false;
 
     socketIdToUserId.set(socketId, { userId, username, email });
+
     return true;
 };
 
